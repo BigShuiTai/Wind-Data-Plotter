@@ -38,7 +38,7 @@ def sate_name(fname):
     return name
 
 
-def grid(fname, georange, sfname):
+def grid(route, fname, georange, sfname):
     lats, lons, data_spd, data_dir, data_time = rgrib.extract(fname, 0)
     
     if not georange == None and not georange == false:
@@ -245,4 +245,4 @@ def grid(fname, georange, sfname):
 
 # Just a demonstrate code
 hy_file = "H2C_OPER_SCA_L2B_OR_20210731T015738_20210731T034357_04277_dps_250_21_owv.h5"
-grid(hy_file, (-40,-25,150,165), hy_file.replace(".h5", ""))
+grid("", hy_file, (-40,-25,150,165), hy_file.replace(".h5", ""))
