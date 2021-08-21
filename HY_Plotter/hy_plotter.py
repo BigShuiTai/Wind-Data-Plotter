@@ -39,7 +39,7 @@ def sate_name(fname):
 
 
 def grid(route, fname, georange, sfname):
-    lats, lons, data_spd, data_dir, data_time = rgrib.extract(fname, 0)
+    lats, lons, data_spd, data_dir, data_time = rgrib.extract(route + fname, 0)
     
     if not georange == None and not georange == false:
         # get range parameter
