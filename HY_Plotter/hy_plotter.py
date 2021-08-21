@@ -34,14 +34,17 @@ def sate_name(fname):
     elif fname[:3] == "H2C":
         name = "HY-2C"
     else:
-        name = "HY-2"
+        if fname[:3] == "CFO":
+            name = "CFOSAT"
+        else:
+            name = "HY-2/CFO"
     return name
 
 
 def grid(route, fname, georange, sfname):
     lats, lons, data_spd, data_dir, data_time = rgrib.extract(route + fname, 0)
     
-    if not georange == None and not georange == false:
+    if not georange == None and not georange == False:
         # get range parameter
         latmin, latmax, lonmin, lonmax = georange
         # process longitude/latitude parameter
@@ -53,6 +56,9 @@ def grid(route, fname, georange, sfname):
             lonmin, lonmax = lonmax, lonmin
         if latmin > latmax:
             latmin, latmax = latmax, latmin
+    else:
+        georange = (-89, 89, 1, 359)
+        latmin, latmax, lonmin, lonmax = georange
     
     # get an appropriate fig sizes
     figsize = calc_figsize(georange)
@@ -66,13 +72,16 @@ def grid(route, fname, georange, sfname):
     # set figure and axis
     fig = plt.figure(figsize=figsize)
     ax = fig.add_axes([0, 0, 1, 1], projection=proj)
-    if not georange == None and not georange == false:
+    if not georange == None and not georange == False:
         ax.set_extent([lonmin, lonmax, latmin, latmax], crs=data_crs)
     else:
         ax.set_global()
     
     # process data's valid time (latest)
-    data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H%M%S").strftime('%Y/%m/%d %H%MZ')
+    if sate_name(fname) == "CFOSAT":
+        data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
+    else:
+        data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H%M%S").strftime('%Y/%m/%d %H%MZ')
     
     print("...PLOTING...")
     
@@ -81,11 +90,15 @@ def grid(route, fname, georange, sfname):
     # You can delete these codes if you do not want to show the max wind
     '''
     dspd = []
-    data = data_spd.filled()
-    for i in range(len(lons)):
-        for j in range(len(lons[i])):
-            if lons[i][j] <= lonmax and lons[i][j] >= lonmin and lats[i][j] <= latmax and lats[i][j] >= latmin:
-                if not data[i][j] == 1e+20:
+    lon, lat, data = lons.filled(), lats.filled(), data_spd.filled()
+    for i in range(len(lon)):
+        for j in range(len(lon[i])):
+            if lon[i][j] == -32768 or lat[i][j] == -32768:
+                continue
+            if lon[i][j] < 0:
+                lon[i][j] = 360 + lon[i][j]
+            if lon[i][j] <= lonmax and lon[i][j] >= lonmin and lat[i][j] <= latmax and lat[i][j] >= latmin:
+                if not data[i][j] == -32768:
                     dspd.append(data[i][j])
             else:
                 continue
@@ -147,7 +160,7 @@ def grid(route, fname, georange, sfname):
     )
     
     # add gridlines
-    dlon = dlat = 2
+    dlon = dlat = int((latmax - latmin) / 6)
     xticks = np.arange(int(lonmin - lonmin%dlon) - dlon, int(lonmax - lonmax%-dlon) + dlon, dlon)
     yticks = np.arange(int(latmin - latmin%dlat) - dlat, int(latmax - latmax%-dlat) + dlat, dlat)
     # fix labels location
@@ -244,5 +257,6 @@ def grid(route, fname, georange, sfname):
     plt.close("all")
 
 # Just a demonstrate code
-hy_file = "H2C_OPER_SCA_L2B_OR_20210731T015738_20210731T034357_04277_dps_250_21_owv.h5"
-grid("", hy_file, (-40,-25,150,165), hy_file.replace(".h5", ""))
+route = ""
+hy_file = "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
+grid(route, hy_file, False, hy_file.replace(".h5", "").replace(".nc", ""))
