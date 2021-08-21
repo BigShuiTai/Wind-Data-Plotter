@@ -103,14 +103,3 @@ def get_colormap(name):
         return 0
     vmin, vmax, colormap = parse_colormap(data)
     return LSCMAP(name, colormap), vmin, vmax
-
-
-def get_ir_colormap_list():
-    all_cmap = glob.glob("satima/colormap/*.txt")
-    cm_name = list()
-    for cm in all_cmap:
-        _, cn = os.path.split(cm)
-        cm_name.append(cn.rstrip(".txt").upper())
-    for wv_cm in ["NOAA", "SSD", "NRL"]:
-        cm_name.remove(wv_cm)
-    return cm_name
