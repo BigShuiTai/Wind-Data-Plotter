@@ -20,14 +20,12 @@ DEFAULT_WIDTH = 5
 
 data_crs = ccrs.PlateCarree()
 
-@staticmethod
 def calc_figsize(georange):
     latmin, latmax, lonmin, lonmax = georange
     ratio = (latmax - latmin) / (lonmax - lonmin)
     figsize = (DEFAULT_WIDTH, DEFAULT_WIDTH * ratio)
     return figsize
 
-@classmethod
 def sate_name(fname):
     if fname[:3] == "H2A":
         name = "HY-2A"
@@ -235,4 +233,5 @@ def grid(fname, georange, sfname):
     plt.close("all")
 
 # Just a demonstrate code
-grid("H2C/H2C_OPER_SCA_L2B_OR_20210731T015738_20210731T034357_04277_dps_250_21_owv.h5", (-40,-25,150,165), "H2C_OPER_SCA_L2B_OR_20210731T015738_20210731T034357_04277_dps_250_21_owv")
+hy_file = "H2C_OPER_SCA_L2B_OR_20210731T015738_20210731T034357_04277_dps_250_21_owv.h5"
+grid(hy_file, (-40,-25,150,165), hy_file.replace(".h5", ""))
