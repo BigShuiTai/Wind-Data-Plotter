@@ -1,16 +1,16 @@
 # HY-2-L2B-Data-Plotter
 [中文文档](/README_CN.md) 
   
-HY-2 A to C Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5)   
+HY-2 A to C & CFOSAT Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5 / netCDF)  
 
 ## Starting
 
- * HY Plotter supports HY-2A/HY-2B/HY-2C SCA L2B data based on HDF5
- * If you want to download HY-2 data, you can visit: [国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
+ * HY Plotter supports HY-2A/HY-2B/HY-2C SCA L2B data based on HDF5, and CFOSAT SCA L2B data based on netCDF
+ * If you want to download HY-2/CFOSAT data, you can visit: [国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
 
 ## Modify targeted file in HY Plotter
 
-If you want to load HY-2 data in HY Plotter correctly, you must modify the targeted file parameter. Here's an example: 
+If you want to load HY-2/CFOSAT data in HY Plotter correctly, you must modify the targeted file parameter. Here's an example: 
 ```py
 # demo codes
 route = "C:/Users/Administrator/Desktop/Sat/"
@@ -20,7 +20,7 @@ grid(route, hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""))
 
 ## Choosing longitude and latitude range
 
-While plotting HY-2 data, you might need setting longitude and latitude range.
+While plotting HY-2/CFOSAT data, you might need setting longitude and latitude range.
 
 If ```georange``` parameter sets ```None``` or ```false```, HY Plotter will set a global extent.
 
@@ -39,3 +39,4 @@ If you meet some difficulties or bugs, please submit issues to us.
 
 Demo picture:
 ![H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv](https://user-images.githubusercontent.com/54111871/130322471-36a3eb55-6f9f-4e08-9635-f46821782d0d.png)
+![CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv](https://user-images.githubusercontent.com/79071461/130332521-a5f5c0ad-99f2-472f-b9ce-4b9e1280b3ae.png)
