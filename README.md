@@ -4,10 +4,12 @@
 HY-2 A to C Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5)   
 
 ## Starting
+
  * HY Plotter supports HY-2A/HY-2B/HY-2C SCA L2B data based on HDF5
  * If you want to download HY-2 data, you can go to:[国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
 
-### Modify targeted file in HY Plotter
+## Modify targeted file in HY Plotter
+
 If you want to load HY-2 data in HY Plotter correctly, you must modify the targeted file parameter. Here's an example: 
 ```py
 # demo codes
@@ -15,7 +17,8 @@ hy_file = "C:/Users/Administrator/Desktop/Sat/H2B_OPER_SCA_L2B_OR_20210819T22590
 grid(hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""))
 ```
 
-#### Choosing longitude and latitude range
+## Choosing longitude and latitude range
+
 While plotting HY-2 data, you might need setting longitude and latitude range.
 
 If ```georange``` parameter sets ```None``` or ```false```, HY Plotter will set a global extent.
