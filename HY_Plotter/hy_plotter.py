@@ -41,7 +41,7 @@ def sate_name(fname):
 def grid(fname, georange, sfname):
     lats, lons, data_spd, data_dir, data_time = rgrib.extract(fname, 0)
     
-    if not georange == None or georange == false:
+    if not georange == None and not georange == false:
         # get range parameter
         latmin, latmax, lonmin, lonmax = georange
         # process longitude/latitude parameter
@@ -66,7 +66,7 @@ def grid(fname, georange, sfname):
     # set figure and axis
     fig = plt.figure(figsize=figsize)
     ax = fig.add_axes([0, 0, 1, 1], projection=proj)
-    if not georange == None or georange == false:
+    if not georange == None and not georange == false:
         ax.set_extent([lonmin, lonmax, latmin, latmax], crs=data_crs)
     else:
         ax.set_global()
