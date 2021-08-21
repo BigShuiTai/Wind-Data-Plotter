@@ -17,8 +17,11 @@ grid(hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""))
 
 #### Choosing longitude and latitude range
 While plotting HY-2 data, you might need setting longitude and latitude range.
+
 If ```georange``` parameter sets ```None``` or ```false```, HY Plotter will set a global extent.
+
 But if you are not setting any values on ```georange```, or it isn't a four-length turple, HY Plotter will raise an error.
+
 Example:
 ```py
 # demo codes
