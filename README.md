@@ -6,7 +6,7 @@ HY-2 A to C Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5)
 ## Starting
 
  * HY Plotter supports HY-2A/HY-2B/HY-2C SCA L2B data based on HDF5
- * If you want to download HY-2 data, you can go to:[国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
+ * If you want to download HY-2 data, you can visit: [国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
 
 ## Modify targeted file in HY Plotter
 
