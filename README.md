@@ -13,8 +13,9 @@ HY-2 A to C Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5)
 If you want to load HY-2 data in HY Plotter correctly, you must modify the targeted file parameter. Here's an example: 
 ```py
 # demo codes
-hy_file = "C:/Users/Administrator/Desktop/Sat/H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
-grid(hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""))
+route = "C:/Users/Administrator/Desktop/Sat/"
+hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
+grid(route, hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""))
 ```
 
 ## Choosing longitude and latitude range
@@ -28,9 +29,10 @@ But if you are not setting any values on ```georange```, or it isn't a four-leng
 Example:
 ```py
 # demo codes
-hy_file = "C:/Users/Administrator/Desktop/Sat/H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
+route = "C:/Users/Administrator/Desktop/Sat/"
+hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
 georange = (17, 27, 267, 277)
-grid(hy_file, georange, hy_file.replace(".h5", ""))
+grid(route, hy_file, georange, hy_file.replace(".h5", ""))
 ```
 
 If you meet some difficulties or bugs, please submit issues to us.
