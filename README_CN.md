@@ -1,7 +1,7 @@
  ## HY-2-L2B-Data-Plotter
  
  ### 开始
- * 支持：HY-2A/HY-2B/HY-2C卫星微波辐射计SCA L2B HDF5数据  
+ * 支持：HY-2A/HY-2B/HY-2C卫星微波辐射计SCA L2B HDF5数据 & CFOSAT SCA L2B netCDF4数据
  * 数据下载：[国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
  
  #### 读取数据
@@ -18,3 +18,5 @@ hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_
  如遇问题请提交Issues  
  
 ![H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv](https://user-images.githubusercontent.com/54111871/130322471-36a3eb55-6f9f-4e08-9635-f46821782d0d.png)
+
+![CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv](https://user-images.githubusercontent.com/79071461/130332521-a5f5c0ad-99f2-472f-b9ce-4b9e1280b3ae.png)
