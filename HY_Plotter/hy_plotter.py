@@ -41,8 +41,17 @@ def sate_name(fname):
 def grid(fname, georange, sfname):
     lats, lons, data_spd, data_dir, data_time = rgrib.extract(fname, 0)
     
-    # get range
+    # get range parameter
     latmin, latmax, lonmin, lonmax = georange
+    # process longitude/latitude parameter
+    if lonmin < 0:
+        lonmin = 360 + lonmin
+    if lonmax < 0:
+        lonmax = 360 + lonmax
+    if lonmin > lonmax:
+        lonmin, lonmax = lonmax, lonmin
+    if latmin > latmax:
+        latmin, latmax = latmax, latmin
     
     # get an appropriate fig sizes
     figsize = calc_figsize(georange)
@@ -55,9 +64,7 @@ def grid(fname, georange, sfname):
     
     # set figure and axis
     fig = plt.figure(figsize=figsize)
-    ax = fig.add_axes(
-        [0, 0, 1, 1], projection=proj
-    )
+    ax = fig.add_axes([0, 0, 1, 1], projection=proj)
     ax.set_extent([lonmin, lonmax, latmin, latmax], crs=data_crs)
     
     # process data's valid time (latest)
