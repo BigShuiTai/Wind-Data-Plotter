@@ -18,6 +18,7 @@ class Rpdgrib(object):
             lons, lats = np.ma.array(lons, mask=lons == 1.7e+38, fill_value=-32768), np.ma.array(lats, mask=lats == 1.7e+38, fill_value=-32768)
             data_spd, data_dir = np.ma.array(data_spd, mask=data_spd == -32767, fill_value=-32768), np.ma.array(data_dir, mask=data_dir == -32767, fill_value=-32768)
             data_spd, data_dir = data_spd / 100 / 0.514, data_dir / 10
+            data_sat = str(init.attrs["Platform_ShortName"][:][init.attrs["Platform_ShortName"][:] != b''][-1]).replace("b","").replace("'","").strip()
         if ".nc" in fname:
             init = netCDF4.Dataset(fname)
             # get values
@@ -27,4 +28,4 @@ class Rpdgrib(object):
             data_time = init.time_coverage_end
             # process values
             data_spd = data_spd / 0.514
-        return lats, lons, data_spd, data_dir, data_time
+        return lats, lons, data_spd, data_dir, data_time, data_sat

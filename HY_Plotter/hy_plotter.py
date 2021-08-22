@@ -42,7 +42,7 @@ def sate_name(fname):
 
 
 def grid(route, fname, georange, sfname):
-    lats, lons, data_spd, data_dir, data_time = rgrib.extract(route + fname, 0)
+    lats, lons, data_spd, data_dir, data_time, data_sat = rgrib.extract(route + fname, 0)
     
     if not georange == None and not georange == False:
         # get range parameter
@@ -108,7 +108,7 @@ def grid(route, fname, georange, sfname):
         damax = "0.0"
     
     # add annotate at the top of figure
-    text = f'{sate_name(fname)} Scatterometer Level 2B 10-meter Wind (brabs) [kt]\nValid Time: {data_time} | Max. Wind: {damax}kt'
+    text = f'{data_sat} Scatterometer Level 2B 10-meter Wind (brabs) [kt]\nValid Time: {data_time} | Max. Wind: {damax}kt'
     bbox_alpha = 0.5
     plt.annotate(
         text,
