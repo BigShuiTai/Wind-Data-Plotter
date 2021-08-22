@@ -20,7 +20,7 @@ from rpdgrib.colormap import colormap as cm
 from rpdgrib.rpdgrib import Rpdgrib as rgrib
 
 CONFIG = True
-AUTO_SAVE_FIGURE = True
+AUTO_SAVE_FIGURE = False
 
 DEFAULT_WIDTH = 5
 
@@ -247,6 +247,13 @@ def grid(route, fname, georange, sfname, config):
     plt.axis("off")
     
     # save figure
+    try:
+        if sfname == "":
+            raise ValueError("File name should not an empty string")
+    except ValueError as e:
+        print(repr(e))
+        sys.exit(0)
+    
     ptext = sfname
     plt.savefig(
         ptext,
