@@ -29,7 +29,8 @@ CONFIG = True   # default is False
     "projection": "PlateCarree",
     "projection_parameters": {"central_longitude": 180},
     "data_route": "C:/Users/Administrator/Desktop/Sat/",
-    "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
+    "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc",
+    "save_file": ""
 }
 ```
 
