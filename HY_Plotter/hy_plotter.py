@@ -20,6 +20,7 @@ from rpdgrib.colormap import colormap as cm
 from rpdgrib.rpdgrib import Rpdgrib as rgrib
 
 CONFIG = True
+AUTO_SAVE_FIGURE = True
 
 DEFAULT_WIDTH = 5
 
@@ -263,8 +264,16 @@ if CONFIG:
         config = json.load(f)
         route = config["data_route"]
         file = config["data_file"]
+        if AUTO_SAVE_FIGURE:
+            save_name = file.split(".")[0]
+        else:
+            save_name = config["save_file"]
 else:
     route = ""
     file = "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
+    if AUTO_SAVE_FIGURE:
+        save_name = file.split(".")[0]
+    else:
+        save_name = config["save_file"]
 # finish loading config, start gird
-grid(route, file, (16.035, 28.035, 221.122, 233.122), file.split(".")[0], config)
+grid(route, file, (16.035, 28.035, 221.122, 233.122), save_name, config)
