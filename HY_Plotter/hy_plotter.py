@@ -32,7 +32,9 @@ def calc_figsize(georange):
     figsize = (DEFAULT_WIDTH, DEFAULT_WIDTH * ratio)
     return figsize
 
-def grid(route, fname, georange, sfname, config):
+def grid(route, fname, georange, sfname, **kwargs):
+    config = kwargs["config"]
+    
     lats, lons, data_spd, data_dir, data_time, sate_name = rgrib.extract(route + fname, 0)
     
     if not georange == None and not georange == False:
@@ -283,4 +285,4 @@ else:
     else:
         save_name = config["save_file"]
 # finish loading config, start gird
-grid(route, file, (16.035, 28.035, 221.122, 233.122), save_name, config)
+grid(route, file, (16.035, 28.035, 221.122, 233.122), save_name, config=config)
