@@ -1,4 +1,4 @@
-# HY-2-L2B-Data-Plotter
+# HY-CFOSAT-L2B-Wind-Data-Plotter
 [中文文档](/README_CN.md) 
   
 HY-2 A to C & CFOSAT Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5 / netCDF)  
