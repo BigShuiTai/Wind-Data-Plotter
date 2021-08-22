@@ -17,6 +17,21 @@ route = "C:/Users/Administrator/Desktop/Sat/"
 hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
 grid(route, hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""))
 ```
+****For convenience, we have added a config loading method. If you truly want to use config, Here's an example for you:****
+ * Firstly, changing the status of CONFIG parameter:
+```py
+# demo codes
+CONFIG = True // default is False
+```
+* Then, modifying config.json to correct config for HY Plotter:
+```json
+{
+    "projection": "PlateCarree", // projection name
+    "projection_parameters": {"central_longitude": 180}, // projection parameters
+    "data_route": "", // HY-2/CFOSAT data file route
+    "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc" // HY-2/CFOSAT data file name
+}
+```
 
 ## Choosing longitude and latitude range
 
