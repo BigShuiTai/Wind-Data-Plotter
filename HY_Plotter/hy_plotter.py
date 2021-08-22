@@ -19,7 +19,7 @@ from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 from rpdgrib.colormap import colormap as cm
 from rpdgrib.rpdgrib import Rpdgrib as rgrib
 
-CONFIG = False
+CONFIG = True
 
 DEFAULT_WIDTH = 5
 
@@ -31,7 +31,7 @@ def calc_figsize(georange):
     figsize = (DEFAULT_WIDTH, DEFAULT_WIDTH * ratio)
     return figsize
 
-def grid(route, fname, georange, sfname):
+def grid(route, fname, georange, sfname, config):
     lats, lons, data_spd, data_dir, data_time, sate_name = rgrib.extract(route + fname, 0)
     
     if not georange == None and not georange == False:
@@ -58,7 +58,7 @@ def grid(route, fname, georange, sfname):
     
     # set axes projection
     if CONFIG:
-        proj = getattr(ccrs, self.conf["projection"])
+        proj = getattr(ccrs, config["projection"])
     else:
         proj = ccrs.PlateCarree(central_longitude=180)
     
@@ -66,7 +66,7 @@ def grid(route, fname, georange, sfname):
     # set figure and axis
     fig = plt.figure(figsize=figsize)
     if CONFIG:
-        ax = fig.add_axes([0, 0, 1, 1], projection=proj(**self.conf["projection_parameters"]))
+        ax = fig.add_axes([0, 0, 1, 1], projection=proj(**config["projection_parameters"]))
     else:
         ax = fig.add_axes([0, 0, 1, 1], projection=proj)
     if not georange == None and not georange == False:
@@ -267,4 +267,4 @@ else:
     route = ""
     file = "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
 # finish loading config, start gird
-grid(route, file, (16.035, 28.035, 221.122, 233.122), file.split(".")[0])
+grid(route, file, (16.035, 28.035, 221.122, 233.122), file.split(".")[0], config)
