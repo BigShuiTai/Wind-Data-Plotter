@@ -21,7 +21,7 @@ grid(route, hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""))
  * Firstly, changing the status of CONFIG parameter:
 ```py
 # demo codes
-CONFIG = True // default is False
+CONFIG = True   # default is False
 ```
 * Then, modifying config.json to correct config for HY Plotter:
 ```json
