@@ -10,7 +10,7 @@ HY-2 A to C & CFOSAT Satellite Wind Speed & Wind Dirctory Data Plotter (Based on
 
 ## Modify targeted file in HY Plotter
 
-If you want to load HY-2/CFOSAT data in HY Plotter correctly, you must modify the targeted file parameter. Here's an example: 
+If you want to load HY-2/CFOSAT data in HY Plotter correctly, you must modify the targeted file parameter `hy_file` or `file`. Here's an example: 
 ```py
 # demo codes
 route = "C:/Users/Administrator/Desktop/Sat/"
