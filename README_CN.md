@@ -1,4 +1,4 @@
- ## HY-2-L2B-Data-Plotter
+ ## HY-CFOSAT-L2B-Wind-Data-Plotter
  
  ### 开始
  * 支持：HY-2A/HY-2B/HY-2C卫星微波辐射计SCA L2B HDF5数据 & CFOSAT SCA L2B netCDF4数据
