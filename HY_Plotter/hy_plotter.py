@@ -1,6 +1,9 @@
 import os
 import glob
 import sys
+
+import json
+
 import datetime
 import numpy as np
 
@@ -16,6 +19,8 @@ from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 from rpdgrib.colormap import colormap as cm
 from rpdgrib.rpdgrib import Rpdgrib as rgrib
 
+CONFIG = False
+
 DEFAULT_WIDTH = 5
 
 data_crs = ccrs.PlateCarree()
@@ -26,23 +31,8 @@ def calc_figsize(georange):
     figsize = (DEFAULT_WIDTH, DEFAULT_WIDTH * ratio)
     return figsize
 
-def sate_name(fname):
-    if fname[:3] == "H2A":
-        name = "HY-2A"
-    elif fname[:3] == "H2B":
-        name = "HY-2B"
-    elif fname[:3] == "H2C":
-        name = "HY-2C"
-    else:
-        if fname[:3] == "CFO":
-            name = "CFOSAT"
-        else:
-            name = "HY-2/CFO"
-    return name
-
-
 def grid(route, fname, georange, sfname):
-    lats, lons, data_spd, data_dir, data_time, data_sat = rgrib.extract(route + fname, 0)
+    lats, lons, data_spd, data_dir, data_time, sate_name = rgrib.extract(route + fname, 0)
     
     if not georange == None and not georange == False:
         # get range parameter
@@ -67,21 +57,31 @@ def grid(route, fname, georange, sfname):
     dpi = 1500 / DEFAULT_WIDTH
     
     # set axes projection
-    proj = ccrs.PlateCarree(central_longitude=180)
+    if CONFIG:
+        proj = getattr(ccrs, self.conf["projection"])
+    else:
+        proj = ccrs.PlateCarree(central_longitude=180)
+    
     
     # set figure and axis
     fig = plt.figure(figsize=figsize)
-    ax = fig.add_axes([0, 0, 1, 1], projection=proj)
+    if CONFIG:
+        ax = fig.add_axes([0, 0, 1, 1], projection=proj(**self.conf["projection_parameters"]))
+    else:
+        ax = fig.add_axes([0, 0, 1, 1], projection=proj)
     if not georange == None and not georange == False:
         ax.set_extent([lonmin, lonmax, latmin, latmax], crs=data_crs)
     else:
         ax.set_global()
     
     # process data's valid time (latest)
-    if sate_name(fname) == "CFOSAT":
+    if sate_name == "CFOSAT":
         data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
     else:
-        data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H%M%S").strftime('%Y/%m/%d %H%MZ')
+        try:
+            data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
+        except Exception:
+            data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
     
     print("...PLOTING...")
     
@@ -108,7 +108,7 @@ def grid(route, fname, georange, sfname):
         damax = "0.0"
     
     # add annotate at the top of figure
-    text = f'{data_sat} Scatterometer Level 2B 10-meter Wind (brabs) [kt]\nValid Time: {data_time} | Max. Wind: {damax}kt'
+    text = f'{sate_name} Scatterometer Level 2B 10-meter Wind (brabs) [kt]\nValid Time: {data_time} | Max. Wind: {damax}kt'
     bbox_alpha = 0.5
     plt.annotate(
         text,
@@ -257,6 +257,14 @@ def grid(route, fname, georange, sfname):
     plt.close("all")
 
 # Just a demonstrate code
-route = ""
-hy_file = "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
-grid(route, hy_file, False, hy_file.replace(".h5", "").replace(".nc", ""))
+# loading CONFIG parameter for next step on the method of reading config file
+if CONFIG:
+    with open("config.json", "r") as f:
+        config = json.load(f)
+        route = config["data_route"]
+        file = config["data_file"]
+else:
+    route = ""
+    file = "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
+# finish loading config, start gird
+grid(route, file, (16.035, 28.035, 221.122, 233.122), hy_file.split(".")[0])
