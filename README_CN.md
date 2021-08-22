@@ -10,10 +10,30 @@
 route = "C:/Users/Administrator/Desktop/Sat/"
 hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
 ```  
+为了方便起见，我们添加了一个配置加载方法。如果想使用config，请按照示例配置：
+* 开启CONFIG
+```py
+# demo codes
+CONFIG = True   # default is False
+```
+* 修改`config.json`进行配置
+```json
+{
+    "projection": "PlateCarree",
+    "projection_parameters": {"central_longitude": 180},
+    "data_route": "C:/Users/Administrator/Desktop/Sat/",
+    "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
+}
+```
  #### 选择数据区域
  将`hy_plotter.py`中`grid(route, hy_file, (-40,-25,150,165), hy_file.replace(".h5", ""))`修改为所需绘制地区经纬，填写时纬度在前经度在后。
  ```py
- grid(route, hy_file, (17,27,267,277), hy_file.replace(".h5", ""))
+# demo codes
+route = "C:/Users/Administrator/Desktop/Sat/"
+hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
+georange = (17, 27, 267, 277)
+grid(route, hy_file, georange, hy_file.replace(".h5", ""))
+
  ```
  如遇问题请提交Issues  
  
