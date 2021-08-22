@@ -267,4 +267,4 @@ else:
     route = ""
     file = "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
 # finish loading config, start gird
-grid(route, file, (16.035, 28.035, 221.122, 233.122), hy_file.split(".")[0])
+grid(route, file, (16.035, 28.035, 221.122, 233.122), file.split(".")[0])
