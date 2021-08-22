@@ -26,10 +26,10 @@ CONFIG = True // default is False
 * Then, modifying config.json to correct config for HY Plotter:
 ```json
 {
-    "projection": "PlateCarree", //projection name
-    "projection_parameters": {"central_longitude": 180}, //projection parameters
-    "data_route": "", //HY-2/CFOSAT data file route
-    "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc" //HY-2/CFOSAT data file name
+    "projection": "PlateCarree", /* projection name */
+    "projection_parameters": {"central_longitude": 180}, /* projection parameters */
+    "data_route": "", /* HY-2/CFOSAT data file route */
+    "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc" /* HY-2/CFOSAT data file name */
 }
 ```
 
