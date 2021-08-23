@@ -140,6 +140,7 @@ def grid(route, fname, georange, sfname, **kwargs):
         pad=0,
         aspect=50,
         fraction=0.02,
+        extend='both'
     )
     # set color-bar params
     cb.set_ticks([5, 15, 25, 35, 45, 55, 65])
