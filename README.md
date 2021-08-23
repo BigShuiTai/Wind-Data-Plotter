@@ -56,4 +56,4 @@ If you meet some difficulties or bugs, please submit issues to us.
 
 Demo pictures:
 
-![CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.png](https://user-images.githubusercontent.com/79071461/130428146-4ed73775-6aa4-42ea-8352-384f14ecf759.png)
+![CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.png](https://user-images.githubusercontent.com/79071461/130433491-dd16ae43-6f0e-49d5-a233-6ecad9891ac8.png)
