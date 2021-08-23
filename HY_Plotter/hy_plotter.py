@@ -67,15 +67,15 @@ def grid(route, fname, georange, sfname, **kwargs):
     
     
     # set figure and axis
-    fig = plt.figure(figsize=figsize)
     if CONFIG:
-        ax = fig.add_axes([0, 0, 1, 1], projection=proj(**config["projection_parameters"]))
+        fig, ax = plt.subplots(figsize=figsize, subplot_kw=dict(projection=proj(**config["projection_parameters"])))
     else:
-        ax = fig.add_axes([0, 0, 1, 1], projection=proj)
+        fig, ax = plt.subplots(figsize=figsize, subplot_kw=dict(projection=proj))
     if not georange == None and not georange == False:
         ax.set_extent([lonmin, lonmax, latmin, latmax], crs=data_crs)
     else:
         ax.set_global()
+    ax.patch.set_facecolor("#000000")
     
     # process data's valid time (latest)
     if sate_name == "CFOSAT":
@@ -111,19 +111,10 @@ def grid(route, fname, georange, sfname, **kwargs):
         damax = "0.0"
     
     # add annotate at the top of figure
-    text = f'{sate_name} Scatterometer Level 2B 10-meter Wind (brabs) [kt]\nValid Time: {data_time} | Max. Wind: {damax}kt'
-    bbox_alpha = 0.5
-    plt.annotate(
-        text,
-        xy=(0.012, 0.987),
-        va="top",
-        ha="left",
-        xycoords="axes fraction",
-        bbox=dict(facecolor="w", edgecolor="none", alpha=bbox_alpha),
-        fontsize=6,
-        family="DejaVu Sans",
-        weight="500",
-    )
+    text = f'{sate_name} Scatterometer Level 2B 10-meter Wind (brabs) [kt]\nValid Time: {data_time}'
+    ax.set_title(text, loc='left', fontsize=5)
+    text = f'Max. Wind: {damax}kt'
+    ax.set_title(text, loc='right', fontsize=4)
     
     # plot brabs with colormap and color-bar
     cmap, vmin, vmax = cm.get_colormap("hy")
@@ -147,12 +138,12 @@ def grid(route, fname, georange, sfname, **kwargs):
         ax=ax,
         orientation='vertical',
         pad=0,
-        aspect=48,
+        aspect=50,
         fraction=0.02,
     )
     # set color-bar params
     cb.set_ticks([5, 15, 25, 35, 45, 55, 65])
-    cb.ax.tick_params(labelsize=5)
+    cb.ax.tick_params(labelsize=4)
     
     # add coastlines
     ax.add_feature(
@@ -163,24 +154,13 @@ def grid(route, fname, georange, sfname, **kwargs):
     )
     
     # add gridlines
-    dlon = dlat = int((latmax - latmin) / 6)
+    dlon = round((lonmax - lonmin) / 4, 2)
+    dlat = round((latmax - latmin) / 4, 2)
     xticks = np.arange(int(lonmin - lonmin%dlon) - dlon, int(lonmax - lonmax%-dlon) + dlon, dlon)
     yticks = np.arange(int(latmin - latmin%dlat) - dlat, int(latmax - latmax%-dlat) + dlat, dlat)
     # fix labels location
-    xticks = xticks[(xticks>lonmin) & (xticks<lonmax)]
-    yticks = yticks[(yticks>latmin) & (yticks<latmax)]
-    if xticks[-1] / lonmax > 0.98 and xticks[-1] / lonmax < 1:
-        ha = 'right'
-    elif xticks[0] / lonmin >= 1 and xticks[0] / lonmin < 1.02:
-        ha = 'left'
-    else:
-        ha = 'center'
-    if yticks[-1] / latmax > 0.98 and yticks[-1] / latmax < 1:
-        va = 'top'
-    elif yticks[0] / latmin >= 1 and yticks[0] / latmin < 1.02:
-        va = 'bottom'
-    else:
-        va = 'center'
+    x = xticks[(xticks>lonmin) & (xticks<lonmax)]
+    y = yticks[(yticks>latmin) & (yticks<latmax)]
     # fix xticks
     xi = np.where(xticks > 180)
     for i in range(len(xi[0])):
@@ -190,7 +170,7 @@ def grid(route, fname, georange, sfname, **kwargs):
     ax.xaxis.set_major_formatter(lon_formatter)
     ax.yaxis.set_major_formatter(lat_formatter)
     gl = ax.gridlines(
-        crs=data_crs,
+        crs=ccrs.PlateCarree(),
         draw_labels=False,
         linewidth=0.6,
         linestyle=':',
@@ -202,35 +182,40 @@ def grid(route, fname, georange, sfname, **kwargs):
     for i in yticks:
         if i < latmin or i > latmax:
             continue
+        if i - int(i) == 0:
+            i = int(i)
         if i > 0:
-            j = str(i) + "°N"
+            j = str(round(i, 2)) + "°N"
         elif i < 0:
-            j = str(-1 * i) + "°S"
+            j = str(round(-1 * i, 2)) + "°S"
         else:
-            j = str(i) + "°"
+            j = str(int(i)) + "°"
         plt.text(
             transform=data_crs,
             s=j,
-            x=lonmin,
+            x=lonmin - dlon * 0.05,
             y=i,
-            va=va,
+            ha="right",
+            va="center",
             fontsize=4,
             family="DejaVu Sans",
             weight="500",
-            color="#000000"
+            color="k"
         )
     for i in xticks:
+        if i - int(i) == 0:
+            i = int(i)
         if i > 180:
-            j = str(360 - i) + "°W"
+            j = str(str(round(360 - i, 2))) + "°W"
             k = i
         elif i < 180 and i > 0:
-            j = str(i) + "°E"
+            j = str(round(i, 2)) + "°E"
             k = i
         elif i < 0:
-            j = str(-1 * i) + "°W"
+            j = str(round(-1 * i, 2)) + "°W"
             k = 360 + i
         else:
-            j = str(i) + "°"
+            j = str(int(i)) + "°"
             k = i
         if k < lonmin or k > lonmax:
             continue
@@ -238,12 +223,13 @@ def grid(route, fname, georange, sfname, **kwargs):
             transform=data_crs,
             s=j,
             x=i,
-            y=latmin,
-            ha=ha,
+            y=latmin - dlat * 0.05,
+            ha="center",
+            va="top",
             fontsize=4,
             family="DejaVu Sans",
             weight="500",
-            color="#000000"
+            color="k"
         )
     
     plt.axis("off")
@@ -261,7 +247,7 @@ def grid(route, fname, georange, sfname, **kwargs):
         ptext,
         dpi=dpi,
         bbox_inches="tight",
-        pad_inches=0,
+        pad_inches=0.02,
     )
     
     plt.close("all")
