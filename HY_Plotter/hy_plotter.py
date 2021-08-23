@@ -286,6 +286,7 @@ else:
         save_name = file.split(".")[0]
     else:
         save_name = ""  # fill in any name what you like
-
+if not isinstance(georange, tuple):
+    raise
 # finish loading config, start gird
 grid(route, file, georange, save_name, config=config)
