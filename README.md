@@ -28,9 +28,10 @@ CONFIG = True   # default is False
 {
     "projection": "PlateCarree",
     "projection_parameters": {"central_longitude": 180},
+    "data_georange": [12, 14, 125, 127],
     "data_route": "C:/Users/Administrator/Desktop/Sat/",
     "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc",
-    "save_file": ""
+    "save_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv"
 }
 ```
 
@@ -40,7 +41,7 @@ While plotting HY-2/CFOSAT data, you might need setting longitude and latitude r
 
 If ```georange``` parameter sets ```None``` or ```false```, HY Plotter will set a global extent.
 
-But if you are not setting any values on ```georange```, or it isn't a four-length turple, HY Plotter will raise an error.
+But if you are not setting any values on ```georange```, or it isn't a four-length tuple, HY Plotter will raise an error.
 
 Example:
 ```py
