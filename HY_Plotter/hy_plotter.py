@@ -266,13 +266,14 @@ def grid(route, fname, georange, sfname, **kwargs):
     
     plt.close("all")
 
-# Just a demonstrate code
+# main codes
 # loading CONFIG parameter for next step on the method of reading config file
 if CONFIG:
     with open("config.json", "r") as f:
         config = json.load(f)
         route = config["data_route"]
         file = config["data_file"]
+        georange = tuple(config["data_georange"])
         if AUTO_SAVE_FIGURE:
             save_name = file.split(".")[0]
         else:
@@ -280,9 +281,11 @@ if CONFIG:
 else:
     route = ""
     file = "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
+    georange = (16.035, 28.035, 221.122, 233.122) # fill in any tuple what you like
     if AUTO_SAVE_FIGURE:
         save_name = file.split(".")[0]
     else:
-        save_name = config["save_file"]
+        save_name = ""  # fill in any name what you like
+
 # finish loading config, start gird
-grid(route, file, (16.035, 28.035, 221.122, 233.122), save_name, config=config)
+grid(route, file, georange, save_name, config=config)
