@@ -22,6 +22,7 @@ class Rpdgrib(object):
             data_spd, data_dir = data_spd[:,:,band_index], data_dir[:,:,band_index]
             data_time = str(init["wvc_row_time"][:][init["wvc_row_time"][:] != b''][-1]).replace("b","").replace("'","").strip()
             sate_name = str(init.attrs["Platform_ShortName"][-1]).replace("b","").replace("'","").strip()
+            res = "10-meter"
             # process values
             lons, lats = np.ma.array(lons, mask=lons == 1.7e+38, fill_value=-32768), np.ma.array(lats, mask=lats == 1.7e+38, fill_value=-32768)
             data_spd, data_dir = np.ma.array(data_spd, mask=data_spd == -32767, fill_value=-32768), np.ma.array(data_dir, mask=data_dir == -32767, fill_value=-32768)
@@ -33,6 +34,7 @@ class Rpdgrib(object):
             data_spd, data_dir = data_spd[:,:,band_index], data_dir[:,:,band_index]
             data_time = init.time_coverage_end
             sate_name = init.platform
+            res = f"{init.geospatial_lon_resolution}°*{init.geospatial_lat_resolution}°"
             # process values
             data_spd = data_spd / 0.514
-        return lats, lons, data_spd, data_dir, data_time, sate_name
+        return lats, lons, data_spd, data_dir, data_time, sate_name, res
