@@ -88,7 +88,22 @@ def grid(route, fname, georange, sfname, **kwargs):
             except Exception:
                 data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
         else:
-            data_time = datetime.datetime.strptime(data_time, "%Y-%m-%d %H:%M:%S").strftime('%Y/%m/%d %H%MZ')
+            try:
+                data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
+            except Exception:
+                try:
+                    data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
+                except Exception:
+                    try:
+                        data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
+                    except Exception:
+                        try:
+                            data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%S.%fZ").strftime('%Y/%m/%d %H%MZ')
+                        except Exception:
+                            try:
+                                data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
+                            except Exception:
+                                data_time = datetime.datetime.strptime(data_time, "%Y-%m-%d %H:%M:%S").strftime('%Y/%m/%d %H%MZ')
     
     print("...PLOTING...")
     
