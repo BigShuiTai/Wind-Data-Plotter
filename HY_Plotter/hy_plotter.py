@@ -147,7 +147,7 @@ def grid(route, fname, georange, sfname, **kwargs):
         extend='both'
     )
     # set color-bar params
-    cb.set_ticks([5, 15, 25, 35, 45, 55, 65])
+    cb.set_ticks(np.arange(0, 70, 5).tolist())
     cb.ax.tick_params(labelsize=4)
     
     # add coastlines
