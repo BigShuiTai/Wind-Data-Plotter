@@ -14,9 +14,10 @@ HY-2 A to C & CFOSAT & MetOp-ASCAT Satellite Wind Speed & Wind Dirctory Data Plo
 If you want to load HY-2/CFOSAT/MetOp-ASCAT data in HY Plotter correctly, you must modify the targeted file parameter `hy_file` or `file`. Here's an example: 
 ```py
 # demo codes
+config = dict() # In the latest module, config must be an assigned variable, or HY-PLOTTER will raise an error
 route = "C:/Users/Administrator/Desktop/Sat/"
 hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
-grid(route, hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""))
+grid(route, hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""), config=config)
 ```
 ****For convenience, we have added a config loading method. If you truly want to use config, Here's an example for you:****
  * Firstly, changing the status of CONFIG parameter:
@@ -47,10 +48,11 @@ But if you are not setting any values on ```georange```, or it isn't a four-leng
 Example:
 ```py
 # demo codes
+config = dict() # In the latest module, config must be an assigned variable, or HY-PLOTTER will raise an error
 route = "C:/Users/Administrator/Desktop/Sat/"
 hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
 georange = (17, 27, 267, 277)
-grid(route, hy_file, georange, hy_file.replace(".h5", ""))
+grid(route, hy_file, georange, hy_file.replace(".h5", ""), config=config)
 ```
 
 If you meet some difficulties or bugs, please submit issues to us.
