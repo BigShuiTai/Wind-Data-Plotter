@@ -46,7 +46,10 @@ class Rpdgrib(object):
                 data_spd, data_dir = data_spd[:,:,band_index], data_dir[:,:,band_index]
                 data_time = init.time_coverage_end
                 sate_name = f"{init.platform} Scatterometer Level 2B"
-                res = f"{(float(init.geospatial_lon_resolution)+float(init.geospatial_lat_resolution))/2}°"
+                if init.dimensions["numrows"].size == 3248:
+                    res = "0.125°"
+                else:
+                    res = "0.25°"
                 # process values
-                data_spd = data_spd / 0.514
+                data_spd, data_dir = data_spd / 0.514, data_dir - 180
         return lats, lons, data_spd, data_dir, data_time, sate_name, res
