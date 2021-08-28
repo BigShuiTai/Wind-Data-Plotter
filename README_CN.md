@@ -1,7 +1,7 @@
  ## HY-CFOSAT-L2B-Wind-Data-Plotter
  
  ### 开始
- * 支持：HY-2A/HY-2B/HY-2C/MetOp卫星微波辐射计SCA L2B HDF5数据 & CFOSAT SCA L2B netCDF4数据
+ * 支持：HY-2A/HY-2B/HY-2C卫星微波辐射计SCA L2B HDF5数据 & CFOSAT SCA L2B/MetOp L2 Wind netCDF4数据
  * 数据下载：[国家卫星海洋应用中心NSOAS](https://osdds.nsoas.org.cn) [EUMETSAT](https://www.eumetsat.int/)
  
  #### 读取数据
@@ -27,12 +27,13 @@ CONFIG = True   # default is False
 ```
  #### 选择数据区域
  将`hy_plotter.py`中`grid(route, hy_file, (-40,-25,150,165), hy_file.replace(".h5", ""))`修改为所需绘制地区经纬，填写时纬度在前经度在后。
+*  ****注意：在调用`grid`函数之前，若您未开启config自动读取功能，需提前声明`config`变量为`dict()`，否则会报错****
  ```py
 # demo codes
+config = dict()
 route = "C:/Users/Administrator/Desktop/Sat/"
 hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
-georange = (17, 27, 267, 277)
-grid(route, hy_file, georange, hy_file.replace(".h5", ""))
+grid(route, hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""), config=config)
 
  ```
  如遇问题请提交Issues  
