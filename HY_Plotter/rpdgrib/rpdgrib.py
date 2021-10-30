@@ -18,7 +18,7 @@ class Rpdgrib(object):
             # get values
             fns = fname.split("_", -1)
             lons, lats = init["wvc_lon"][:], init["wvc_lat"][:]
-            data_spd, data_dir = init["wind_speed"][:], init["wind_dir"][:]
+            data_spd, data_dir = init["wind_speed_selection"][:], init["wind_dir_selection"][:]
             data_spd, data_dir = data_spd[:,:,band_index], data_dir[:,:,band_index]
             data_time = str(init["wvc_row_time"][:][init["wvc_row_time"][:] != b''][-1]).replace("b","").replace("'","").strip()
             sate_name = str(init.attrs["Platform_ShortName"][-1]).replace("b","").replace("'","").strip() + " Scatterometer Level 2B"
@@ -42,8 +42,8 @@ class Rpdgrib(object):
             else:
                 # get values
                 lons, lats = init.variables["wvc_lon"][:], init.variables["wvc_lat"][:]
-                data_spd, data_dir = init.variables["wind_speed"][:], init.variables["wind_dir"][:]
-                data_spd, data_dir = data_spd[:,:,band_index], data_dir[:,:,band_index]
+                data_spd, data_dir = init.variables["wind_speed_selection"][:], init.variables["wind_dir_selection"][:]
+                # data_spd, data_dir = data_spd[:,:,band_index], data_dir[:,:,band_index]
                 data_time = init.time_coverage_end
                 sate_name = f"{init.platform} Scatterometer Level 2B"
                 if init.dimensions["numrows"].size == 3248:
@@ -51,5 +51,5 @@ class Rpdgrib(object):
                 else:
                     res = "0.25°"
                 # process values
-                data_spd, data_dir = data_spd / 0.514, data_dir - 180
+                data_spd = data_spd / 0.514
         return lats, lons, data_spd, data_dir, data_time, sate_name, res
