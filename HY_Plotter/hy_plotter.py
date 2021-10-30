@@ -174,84 +174,28 @@ def grid(route, fname, georange, sfname, **kwargs):
     )
     
     # add gridlines
-    if isinstance(georange, tuple):
-        dlon = round((lonmax - lonmin) / 4, 2)
-        dlat = round((latmax - latmin) / 4, 2)
-        xticks = np.arange(int(lonmin - lonmin%dlon) - dlon, int(lonmax - lonmax%-dlon) + dlon, dlon)
-        yticks = np.arange(int(latmin - latmin%dlat) - dlat, int(latmax - latmax%-dlat) + dlat, dlat)
-        # fix labels location
-        x = xticks[(xticks>lonmin) & (xticks<lonmax)]
-        y = yticks[(yticks>latmin) & (yticks<latmax)]
-        # fix xticks
-        xi = np.where(xticks > 180)
-        for i in range(len(xi[0])):
-            xticks[xi[0][i]] = xticks[xi[0][i]] - 360
-        lon_formatter = LongitudeFormatter(zero_direction_label=False)
-        lat_formatter = LatitudeFormatter()
-        ax.xaxis.set_major_formatter(lon_formatter)
-        ax.yaxis.set_major_formatter(lat_formatter)
-        gl = ax.gridlines(
-            crs=ccrs.PlateCarree(),
-            draw_labels=False,
-            linewidth=0.6,
-            linestyle=':',
-            color='k',
-            xlocs=xticks,
-            ylocs=yticks,
-        )
-        # add x/y labels
-        for i in yticks:
-            if i < latmin or i > latmax:
-                continue
-            if i - int(i) == 0:
-                i = int(i)
-            if i > 0:
-                j = str(round(i, 2)) + "°N"
-            elif i < 0:
-                j = str(round(-1 * i, 2)) + "°S"
-            else:
-                j = str(int(i)) + "°"
-            plt.text(
-                transform=data_crs,
-                s=j,
-                x=lonmin - dlon * 0.05,
-                y=i,
-                ha="right",
-                va="center",
-                fontsize=4,
-                family="DejaVu Sans",
-                weight="500",
-                color="k"
-            )
-        for i in xticks:
-            if i - int(i) == 0:
-                i = int(i)
-            if i > 180:
-                j = str(str(round(360 - i, 2))) + "°W"
-                k = i
-            elif i < 180 and i > 0:
-                j = str(round(i, 2)) + "°E"
-                k = i
-            elif i < 0:
-                j = str(round(-1 * i, 2)) + "°W"
-                k = 360 + i
-            else:
-                j = str(int(i)) + "°"
-                k = i
-            if k < lonmin or k > lonmax:
-                continue
-            plt.text(
-                transform=data_crs,
-                s=j,
-                x=i,
-                y=latmin - dlat * 0.05,
-                ha="center",
-                va="top",
-                fontsize=4,
-                family="DejaVu Sans",
-                weight="500",
-                color="k"
-            )
+    # if isinstance(georange, tuple):
+    lon_formatter = LongitudeFormatter(zero_direction_label=False)
+    lat_formatter = LatitudeFormatter()
+    ax.xaxis.set_major_formatter(lon_formatter)
+    ax.yaxis.set_major_formatter(lat_formatter)
+    gl = ax.gridlines(
+        crs=data_crs,
+        draw_labels=True,
+        linewidth=0.6,
+        linestyle=':',
+        color='k',
+    )
+    gl.rotate_labels = False
+    gl.xlabels_top = False
+    gl.xlabels_bottom = True
+    gl.ylabels_right = False
+    gl.ylabels_left = True
+    gl.xpadding = 3
+    gl.ypadding = 3
+    gl.xlabel_style = {'size': 4, 'color': 'k', 'ha': 'center'}
+    gl.ylabel_style = {'size': 4, 'color': 'k', 'va': 'center'}
+    plt.rcParams['axes.unicode_minus'] = False
     
     plt.axis("off")
     
@@ -294,7 +238,6 @@ else:
         save_name = file.split(".")[0]
     else:
         save_name = ""  # fill in any name what you like
-if not isinstance(georange, tuple):
-    raise
+
 # finish loading config, start gird
 grid(route, file, georange, save_name, config=config)
