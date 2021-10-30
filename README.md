@@ -54,6 +54,7 @@ hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_
 georange = (17, 27, 267, 277)
 grid(route, hy_file, georange, hy_file.replace(".h5", ""), config=config)
 ```
+*  ****Currently only supports CFOSAT EXPR Data, and doesn't support OPER**** 
 
 If you meet some difficulties or bugs, please submit issues to us.
 
