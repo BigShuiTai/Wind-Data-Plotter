@@ -60,6 +60,4 @@ If you meet some difficulties or bugs, please submit issues to us.
 
 Demo pictures:
 
-![CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.png](https://user-images.githubusercontent.com/79071461/130433491-dd16ae43-6f0e-49d5-a233-6ecad9891ac8.png)
-
-![ascat_20210705_000600_metopc_13795_eps_o_250_3203_ovw.png](https://user-images.githubusercontent.com/79071461/131166619-12ff979c-f48c-4421-bda4-ce3613efacfc.png)
+![CFO_EXPR_SCA_C_L2B_OR_20210723T100441_15127_125_33_owv](https://user-images.githubusercontent.com/79071461/140613081-0293fbb3-0077-445a-8bf4-269ac1454fb5.png)
