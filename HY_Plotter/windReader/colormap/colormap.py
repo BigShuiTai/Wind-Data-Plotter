@@ -98,7 +98,7 @@ def parse_colormap(data):
 
 
 def get_colormap(name):
-    data = parse_colormap_data("rpdgrib/colormap/" + name.lower() + ".txt")
+    data = parse_colormap_data("windReader/colormap/" + name.lower() + ".txt")
     if not data:
         return 0
     vmin, vmax, colormap = parse_colormap(data)
