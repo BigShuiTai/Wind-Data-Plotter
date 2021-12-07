@@ -32,7 +32,11 @@ def calc_figsize(georange):
     figsize = (DEFAULT_WIDTH, DEFAULT_WIDTH * ratio)
     return figsize
 
-def grid(route, fname, georange, sfname, **kwargs):
+def stepcal(lonmax, lonmin, res, num=15, ip=1):
+    totalpt = (lonmax - lonmin) / res * ip
+    return int(totalpt / num)
+
+def grid(route, fname, georange, sfname, res=0.125, num=15, ip=1, **kwargs):
     config = kwargs["config"]
     
     lats, lons, data_spd, data_dir, data_time, sate_name, res = rgrib.get_data(route + fname, 0)
@@ -125,14 +129,26 @@ def grid(route, fname, georange, sfname, **kwargs):
     
     # plot brabs with colormap and color-bar
     cmap, vmin, vmax = cm.get_colormap("wind")
+    
+    bs = stepcal(lonmax, lonmin, res, num, ip)
+    lons, lats = lons[::bs,::bs], lats[::bs,::bs]
     ver = np.asarray([spd*np.sin(agl*np.pi/180) for spd,agl in zip(data_spd,data_dir)])
     hriz = np.asarray([spd*np.cos(agl*np.pi/180) for spd,agl in zip(data_spd,data_dir)])
-    bb = ax.barbs(
+    
+    nh = lats > 0
+    ver_nh = np.ma.masked_where(~nh, ver[::bs,::bs])
+    hriz_nh = np.ma.masked_where(~nh, hriz[::bs,::bs])
+    data_spd_nh = np.ma.masked_where(~nh, data_spd[::bs,::bs])
+    ver_sh = np.ma.masked_where(nh, ver[::bs,::bs])
+    hriz_sh = np.ma.masked_where(nh, hriz[::bs,::bs])
+    data_spd_sh = np.ma.masked_where(nh, data_spd[::bs,::bs])
+    
+    bb0 = ax.barbs(
         lons,
         lats,
-        ver,
-        hriz,
-        data_spd,
+        ver_nh,
+        hriz_nh,
+        data_spd_nh,
         cmap=cmap,
         clim={vmax:vmax, vmin:vmin},
         pivot='middle',
@@ -140,18 +156,48 @@ def grid(route, fname, georange, sfname, **kwargs):
         linewidth=0.5,
         transform=data_crs,
     )
-    cb = plt.colorbar(
-        bb,
+    bb1 = ax.barbs(
+        lons,
+        lats,
+        ver_sh,
+        hriz_sh,
+        data_spd_sh,
+        cmap=cmap,
+        clim={vmax:vmax, vmin:vmin},
+        flip_barb=True,
+        pivot='middle',
+        length=3.5,
+        linewidth=0.5,
+        transform=data_crs,
+    )
+    
+    cb0 = plt.colorbar(
+        bb0,
         ax=ax,
         orientation='vertical',
         pad=0,
-        aspect=50,
-        fraction=0.02,
-        extend='max'
+        aspect=35,
+        fraction=0.03,
+        extend='both',
     )
     # set color-bar params
-    cb.set_ticks(np.arange(0, 70, 5).tolist())
-    cb.ax.tick_params(labelsize=4)
+    cb0.set_ticks(np.arange(0, 70, 5).tolist())
+    cb0.ax.tick_params(labelsize=4, length=0)
+    cb0.outline.set_linewidth(0.3)
+    
+    cb1 = plt.colorbar(
+        bb1,
+        ax=ax,
+        orientation='horizontal',
+        pad=0,
+        aspect=35,
+        fraction=0.03,
+        extend='both',
+    )
+    # set color-bar params
+    cb1.set_ticks(np.arange(0, 70, 5).tolist())
+    cb1.ax.tick_params(labelsize=4, length=0)
+    cb1.outline.set_linewidth(0.3)
     
     # add coastlines
     ax.add_feature(
