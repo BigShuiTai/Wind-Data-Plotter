@@ -274,4 +274,4 @@ else:
         save_name = ""  # fill in any name what you like
 
 # finish loading config, start gird
-grid(route, file, georange, save_name, config=config)
+grid(route, file, georange, save_name, res=0.125, num=20, ip=1, config=config)
