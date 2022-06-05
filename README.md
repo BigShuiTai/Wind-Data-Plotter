@@ -1,11 +1,11 @@
 # HY-CFOSAT-ASCAT-Wind-Data-Plotter
 [中文文档](/README_CN.md) 
   
-HY-2 A to C & CFOSAT & MetOp-ASCAT Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5 / netCDF)  
+HY-2 A to D & CFOSAT & MetOp-ASCAT Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5 / netCDF)  
 
 ## Starting
 
- * HY Plotter supports HY-2A/HY-2B/HY-2C SCA L2B data based on HDF5, CFOSAT SCA L2B & MetOp-ASCAT L2 data based on netCDF
+ * HY Plotter supports HY-2A/HY-2B/HY-2C/HY-2D SCA L2B data based on HDF5, CFOSAT SCA L2B & MetOp-ASCAT L2 data based on netCDF
  * If you want to download HY-2/CFOSAT data, you can visit: [国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
  * There's no MetOp-ASCAT data source temporarily.
 
