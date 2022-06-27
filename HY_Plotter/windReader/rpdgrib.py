@@ -25,6 +25,23 @@ class Rpdgrib(object):
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
             
             try:
+                _test = test_reader("fy3e_hdf", fname)
+                _reader_name = "fy3e_hdf"
+            except Exception:
+                _test = False
+                print("FY3E-Reader cannot read this file.")
+            if _test:
+                reader = load_reader(_reader_name)
+                if _reader_name == "fy3e_hdf":
+                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, band_index)
+                else:
+                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname)
+                return lats, lons, data_spd, data_dir, data_time, sate_name, res
+            else:
+                print("FY3E-Reader cannot read this file.")
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
+            
+            try:
                 _test = test_reader("metop_ascat_nc", fname)
                 _reader_name = "metop_ascat_nc"
             except Exception:
@@ -61,7 +78,7 @@ class Rpdgrib(object):
             return lats, lons, data_spd, data_dir, data_time, sate_name, res
         else:
             reader = load_reader(reader_name)
-            if reader_name == "hy_hdf":
+            if reader_name in ["hy_hdf", "fy3e_hdf"]:
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, band_index)
             else:
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname)

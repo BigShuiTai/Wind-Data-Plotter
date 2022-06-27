@@ -1,13 +1,14 @@
 # HY-CFOSAT-ASCAT-Wind-Data-Plotter
 [中文文档](/README_CN.md) 
   
-HY-2 A to D & CFOSAT & MetOp-ASCAT Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5 / netCDF)  
+HY-2 A to D & FY-3E C/Ku band & CFOSAT & MetOp-ASCAT Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5 / netCDF)  
 
 ## Starting
 
- * HY Plotter supports HY-2A/HY-2B/HY-2C/HY-2D SCA L2B data based on HDF5, CFOSAT SCA L2B & MetOp-ASCAT L2 data based on netCDF
+ * HY Plotter supports HY-2A/HY-2B/HY-2C/HY-2D SCA L2B data based on HDF5, CFOSAT SCA L2B & MetOp-ASCAT L2 data based on netCDF, and FY-3E WindRAD C/Ku band L2 data based on HDF5.
  * If you want to download HY-2/CFOSAT data, you can visit: [国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
- * There's no MetOp-ASCAT data source temporarily.
+ * For MetOp-ASCAT data, you can visit [EUMETSAT](https://www.eumetsat.int/)
+ * For FY-3E WindRAD C/Ku band L2 data, you should visit [NSMC](http://satellite.nsmc.org.cn/PortalSite/Data/Satellite.aspx)
 
 ## Modify targeted file in HY Plotter
 
@@ -30,11 +31,15 @@ CONFIG = True   # default is False
 {
     "projection": "PlateCarree",
     "projection_parameters": {"central_longitude": 180},
-    "data_georange": [12, 14, 125, 127],
-    "data_route": "C:/Users/Administrator/Desktop/Sat/",
-    "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc",
-    "save_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv"
+    "wind_band": "C_band",
+    "lon_lat_step": 5,
+    "full_res": -1,
+    "data_georange": [0, 10, 320, 330],
+    "data_route": "C:/Users/Administrator/Desktop/Sat/HY-CFOSAT-ASCAT-Wind-Data-Plotter-main/",
+    "data_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0.HDF",
+    "save_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0"
 }
+
 ```
 
 ## Choosing longitude and latitude range

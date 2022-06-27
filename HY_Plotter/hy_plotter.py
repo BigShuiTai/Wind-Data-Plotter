@@ -1,4 +1,4 @@
-import os
+﻿import os
 import glob
 import sys
 
@@ -36,10 +36,20 @@ def stepcal(lonmax, lonmin, res, num=15, ip=1):
     totalpt = (lonmax - lonmin) / res * ip
     return int(totalpt / num)
 
-def grid(route, fname, georange, sfname, res=0.125, num=15, ip=1, **kwargs):
+def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, ip=1, full_res=-1, **kwargs):
     config = kwargs["config"]
     
-    lats, lons, data_spd, data_dir, data_time, sate_name, res = rgrib.get_data(route + fname, 0)
+    lats, lons, data_spd, data_dir, data_time, sate_name, res = rgrib.get_data(route + fname, band)
+    
+    # transfroming resolution into degree if it's string type
+    _res_temp = res
+    if isinstance(_res_temp, str):
+        if "°" in _res_temp:
+            _res_temp = float(_res_temp[:-1])
+        elif "KM" in _res_temp.upper():
+            _res_temp = float(_res_temp[:-2]) / 100
+        else:
+            _res_temp = float(_res_temp)
     
     if isinstance(georange, tuple):
         # get range parameter
@@ -91,6 +101,11 @@ def grid(route, fname, georange, sfname, res=0.125, num=15, ip=1, **kwargs):
                 data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
             except Exception:
                 data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
+        elif "FY-3E" in sate_name:
+            try:
+                data_time = datetime.datetime.strptime(data_time, "%Y%m%d%H%M").strftime('%Y/%m/%d %H%MZ')
+            except Exception:
+                data_time = datetime.datetime.strptime(data_time, "%Y%m%d %H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
         else:
             try:
                 data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
@@ -130,18 +145,26 @@ def grid(route, fname, georange, sfname, res=0.125, num=15, ip=1, **kwargs):
     # plot brabs with colormap and color-bar
     cmap, vmin, vmax = cm.get_colormap("wind")
     
-    bs = stepcal(lonmax, lonmin, res, num, ip)
-    lons, lats = lons[::bs,::bs], lats[::bs,::bs]
     ver = np.asarray([spd*np.sin(agl*np.pi/180) for spd,agl in zip(data_spd,data_dir)])
     hriz = np.asarray([spd*np.cos(agl*np.pi/180) for spd,agl in zip(data_spd,data_dir)])
     
+    if full_res == -1:
+        bs = stepcal(lonmax, lonmin, _res_temp, num, ip)
+        _ver = ver[::bs,::bs]
+        _hriz = hriz[::bs,::bs]
+        _spd = data_spd[::bs,::bs]
+        lons, lats = lons[::bs,::bs], lats[::bs,::bs]
+    else:
+        _ver = ver
+        _hriz = hriz
+        _spd = data_spd
     nh = lats > 0
-    ver_nh = np.ma.masked_where(~nh, ver[::bs,::bs])
-    hriz_nh = np.ma.masked_where(~nh, hriz[::bs,::bs])
-    data_spd_nh = np.ma.masked_where(~nh, data_spd[::bs,::bs])
-    ver_sh = np.ma.masked_where(nh, ver[::bs,::bs])
-    hriz_sh = np.ma.masked_where(nh, hriz[::bs,::bs])
-    data_spd_sh = np.ma.masked_where(nh, data_spd[::bs,::bs])
+    ver_nh = np.ma.masked_where(~nh, _ver)
+    hriz_nh = np.ma.masked_where(~nh, _hriz)
+    data_spd_nh = np.ma.masked_where(~nh, _spd)
+    ver_sh = np.ma.masked_where(nh, _ver)
+    hriz_sh = np.ma.masked_where(nh, _hriz)
+    data_spd_sh = np.ma.masked_where(nh, _spd)
     
     bb0 = ax.barbs(
         lons,
@@ -208,7 +231,8 @@ def grid(route, fname, georange, sfname, res=0.125, num=15, ip=1, **kwargs):
     )
     
     # add gridlines
-    # if isinstance(georange, tuple):
+    xticks = np.arange(-180, 181, lonlatstep)
+    yticks = np.arange(-90, 91, lonlatstep)
     lon_formatter = LongitudeFormatter(zero_direction_label=False)
     lat_formatter = LatitudeFormatter()
     ax.xaxis.set_major_formatter(lon_formatter)
@@ -219,10 +243,12 @@ def grid(route, fname, georange, sfname, res=0.125, num=15, ip=1, **kwargs):
         linewidth=0.6,
         linestyle=':',
         color='k',
+        xlocs=xticks,
+        ylocs=yticks,
     )
     gl.rotate_labels = False
-    gl.xlabels_top = False
-    gl.xlabels_bottom = True
+    gl.xlabels_top = True
+    gl.xlabels_bottom = False
     gl.ylabels_right = False
     gl.ylabels_left = True
     gl.xpadding = 3
@@ -258,6 +284,9 @@ if CONFIG:
         config = json.load(f)
         route = config["data_route"]
         file = config["data_file"]
+        band = config["wind_band"]
+        step = config["lon_lat_step"]
+        f_res = int(config["full_res"])
         georange = tuple(config["data_georange"])
         if AUTO_SAVE_FIGURE:
             save_name = file.split(".")[0]
@@ -267,6 +296,9 @@ else:
     config = dict()
     route = ""
     file = "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
+    band = 0
+    step = 10
+    f_res = -1
     georange = (16.035, 28.035, 221.122, 233.122) # fill in any tuple what you like
     if AUTO_SAVE_FIGURE:
         save_name = file.split(".")[0]
@@ -274,4 +306,4 @@ else:
         save_name = ""  # fill in any name what you like
 
 # finish loading config, start gird
-grid(route, file, georange, save_name, res=0.125, num=20, ip=1, config=config)
+grid(route, file, georange, save_name, band, res=0.125, num=20, ip=1, lonlatstep=step, full_res=f_res, config=config)

@@ -24,6 +24,7 @@ class CFOSAT(object):
                 res = "0.25°"
             # process values
             data_spd = data_spd / 0.514
+            lons[lons < 0] += 360
         else:
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
         return lats, lons, data_spd, data_dir, data_time, sate_name, res

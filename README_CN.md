@@ -1,8 +1,8 @@
  ## HY-CFOSAT-L2B-Wind-Data-Plotter
  
  ### 开始
- * 支持：HY-2A/HY-2B/HY-2C卫星微波辐射计SCA L2B HDF5数据 & CFOSAT SCA L2B/MetOp L2 Wind netCDF4数据
- * 数据下载：[国家卫星海洋应用中心NSOAS](https://osdds.nsoas.org.cn) [EUMETSAT](https://www.eumetsat.int/)
+ * 支持：HY-2A/HY-2B/HY-2C卫星微波辐射计SCA L2B HDF5数据 & CFOSAT SCA L2B/MetOp L2 Wind netCDF4数据 & FY-3E WindRAD C/Ku band HDF5数据
+ * 数据下载：[国家卫星海洋应用中心NSOAS](https://osdds.nsoas.org.cn) [EUMETSAT](https://www.eumetsat.int/) [NSMC](http://satellite.nsmc.org.cn/PortalSite/Data/Satellite.aspx)
  
  #### 读取数据
 将`hy_plotter.py`中`route = ""`修改为数据所在路径，`hy_file = ""`修改为数据文件名
@@ -21,9 +21,15 @@ CONFIG = True   # default is False
 {
     "projection": "PlateCarree",
     "projection_parameters": {"central_longitude": 180},
-    "data_route": "C:/Users/Administrator/Desktop/Sat/",
-    "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
+    "wind_band": "C_band",
+    "lon_lat_step": 5,
+    "full_res": -1,
+    "data_georange": [0, 10, 320, 330],
+    "data_route": "C:/Users/Administrator/Desktop/Sat/HY-CFOSAT-ASCAT-Wind-Data-Plotter-main/",
+    "data_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0.HDF",
+    "save_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0"
 }
+
 ```
  #### 选择数据区域
  将`hy_plotter.py`中`grid(route, hy_file, (-40,-25,150,165), hy_file.replace(".h5", ""))`修改为所需绘制地区经纬，填写时纬度在前经度在后。

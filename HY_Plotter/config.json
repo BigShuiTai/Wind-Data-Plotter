@@ -1,8 +1,11 @@
 {
     "projection": "PlateCarree",
     "projection_parameters": {"central_longitude": 180},
-    "data_georange": [23, 28, 123, 128],
+    "wind_band": "C_band",
+    "lon_lat_step": 5,
+    "full_res": -1,
+    "data_georange": [0, 10, 320, 330],
     "data_route": "/www/wwwroot/HY-CFOSAT-ASCAT-Wind-Data-Plotter-main/",
-    "data_file": "CFO_EXPR_SCA_C_L2B_OR_20210723T100441_15127_125_33_owv.nc",
-    "save_file": "CFO_EXPR_SCA_C_L2B_OR_20210723T100441_15127_125_33_owv"
+    "data_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0.HDF",
+    "save_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0"
 }
