@@ -1,4 +1,4 @@
-﻿import os
+import os
 import glob
 import sys
 
@@ -131,7 +131,7 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, 
     # You can delete these codes if you do not want to show the max wind
     '''
     dspd = data_spd[(lons<=lonmax)&(lons>=lonmin)&(lats<=latmax)&(lats>=latmin)]
-    if len(dspd) > 0:
+    if len(dspd) > 0 and not isinstance(dspd.max(), np.ma.core.MaskedConstant):
         damax = round(dspd.max(), 1)
     else:
         damax = "0.0"
@@ -158,44 +158,26 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, 
         _ver = ver
         _hriz = hriz
         _spd = data_spd
+    
     nh = lats > 0
-    ver_nh = np.ma.masked_where(~nh, _ver)
-    hriz_nh = np.ma.masked_where(~nh, _hriz)
-    data_spd_nh = np.ma.masked_where(~nh, _spd)
-    ver_sh = np.ma.masked_where(nh, _ver)
-    hriz_sh = np.ma.masked_where(nh, _hriz)
-    data_spd_sh = np.ma.masked_where(nh, _spd)
     
-    bb0 = ax.barbs(
+    bb = ax.barbs(
         lons,
         lats,
-        ver_nh,
-        hriz_nh,
-        data_spd_nh,
+        _ver,
+        _hriz,
+        _spd,
         cmap=cmap,
         clim={vmax:vmax, vmin:vmin},
-        pivot='middle',
-        length=3.5,
-        linewidth=0.5,
-        transform=data_crs,
-    )
-    bb1 = ax.barbs(
-        lons,
-        lats,
-        ver_sh,
-        hriz_sh,
-        data_spd_sh,
-        cmap=cmap,
-        clim={vmax:vmax, vmin:vmin},
-        flip_barb=True,
+        flip_barb=(~nh),
         pivot='middle',
         length=3.5,
         linewidth=0.5,
         transform=data_crs,
     )
     
-    cb0 = plt.colorbar(
-        bb0,
+    cb = plt.colorbar(
+        bb,
         ax=ax,
         orientation='vertical',
         pad=0,
@@ -204,23 +186,9 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, 
         extend='both',
     )
     # set color-bar params
-    cb0.set_ticks(np.arange(0, 70, 5).tolist())
-    cb0.ax.tick_params(labelsize=4, length=0)
-    cb0.outline.set_linewidth(0.3)
-    
-    cb1 = plt.colorbar(
-        bb1,
-        ax=ax,
-        orientation='horizontal',
-        pad=0,
-        aspect=35,
-        fraction=0.03,
-        extend='both',
-    )
-    # set color-bar params
-    cb1.set_ticks(np.arange(0, 70, 5).tolist())
-    cb1.ax.tick_params(labelsize=4, length=0)
-    cb1.outline.set_linewidth(0.3)
+    cb.set_ticks(np.arange(0, 70, 5).tolist())
+    cb.ax.tick_params(labelsize=4, length=0)
+    cb.outline.set_linewidth(0.3)
     
     # add coastlines
     ax.add_feature(
@@ -247,10 +215,10 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, 
         ylocs=yticks,
     )
     gl.rotate_labels = False
-    gl.xlabels_top = True
-    gl.xlabels_bottom = False
-    gl.ylabels_right = False
-    gl.ylabels_left = True
+    gl.top_labels = False
+    gl.bottom_labels = True
+    gl.right_labels = False
+    gl.left_labels = True
     gl.xpadding = 3
     gl.ypadding = 3
     gl.xlabel_style = {'size': 4, 'color': 'k', 'ha': 'center'}
