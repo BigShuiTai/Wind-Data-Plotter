@@ -219,8 +219,8 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, 
     gl.bottom_labels = True
     gl.right_labels = False
     gl.left_labels = True
-    gl.xpadding = 3
-    gl.ypadding = 3
+    gl.xpadding = 2.5
+    gl.ypadding = 2.5
     gl.xlabel_style = {'size': 4, 'color': 'k', 'ha': 'center'}
     gl.ylabel_style = {'size': 4, 'color': 'k', 'va': 'center'}
     plt.rcParams['axes.unicode_minus'] = False
