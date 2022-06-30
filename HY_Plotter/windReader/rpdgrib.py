@@ -4,82 +4,34 @@ import numpy as np
 
 class Rpdgrib(object):
 
-    def get_data(fname, band_index, reader_name=""):
+    def get_data(fname, band_index, georange, reader_name=""):
         if reader_name == "":
+            reader_names = ["hy_hdf", "fy3e_hdf", "cfosat_nc", "metop_ascat_nc"]
+            readers = ["HY-Reader", "FY3E-Reader", "CFOSAT-Reader", "ASCAT-Reader"]
             # Auto match reader names
-            try:
-                _test = test_reader("hy_hdf", fname)
-                _reader_name = "hy_hdf"
-            except Exception:
-                _test = False
-                print("HY-Reader cannot read this file.")
-            if _test:
-                reader = load_reader(_reader_name)
-                if _reader_name == "hy_hdf":
-                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, band_index)
+            for _reader_name, _reader in zip(reader_names, readers):
+                try:
+                    _test = test_reader(_reader_name, fname)
+                except Exception:
+                    print(f"{_reader} cannot read this file.")
                 else:
-                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname)
-                return lats, lons, data_spd, data_dir, data_time, sate_name, res
+                    if not _test:
+                        print(f"{_reader} cannot read this file.")
+                        continue
+                    reader_name = _reader_name
+                    print(f"Using {_reader} to read this file...")
+                    break
+            if reader_name == "":
+                raise ValueError("Reader name was not found in the support readers list")
+            reader = load_reader(reader_name)
+            if _reader_name == "fy3e_hdf":
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, georange, band=band_index)
             else:
-                print("HY-Reader cannot read this file.")
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
-            
-            try:
-                _test = test_reader("fy3e_hdf", fname)
-                _reader_name = "fy3e_hdf"
-            except Exception:
-                _test = False
-                print("FY3E-Reader cannot read this file.")
-            if _test:
-                reader = load_reader(_reader_name)
-                if _reader_name == "fy3e_hdf":
-                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, band_index)
-                else:
-                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname)
-                return lats, lons, data_spd, data_dir, data_time, sate_name, res
-            else:
-                print("FY3E-Reader cannot read this file.")
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
-            
-            try:
-                _test = test_reader("metop_ascat_nc", fname)
-                _reader_name = "metop_ascat_nc"
-            except Exception:
-                _test = False
-                print("ASCAT-Reader cannot read this file.")
-            if _test:
-                reader = load_reader(_reader_name)
-                if _reader_name == "hy_hdf":
-                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, band_index)
-                else:
-                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname)
-                return lats, lons, data_spd, data_dir, data_time, sate_name, res
-            else:
-                print("ASCAT-Reader cannot read this file.")
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
-            
-            try:
-                _test = test_reader("cfosat_nc", fname)
-                _reader_name = "cfosat_nc"
-            except Exception:
-                _test = False
-                print("CFOSAT-Reader cannot read this file.")
-            if _test:
-                reader = load_reader(_reader_name)
-                if _reader_name == "hy_hdf":
-                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, band_index)
-                else:
-                    lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname)
-                return lats, lons, data_spd, data_dir, data_time, sate_name, res
-            else:
-                print("CFOSAT-Reader cannot read this file.")
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
-            
-            return lats, lons, data_spd, data_dir, data_time, sate_name, res
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, georange)
         else:
             reader = load_reader(reader_name)
-            if reader_name in ["hy_hdf", "fy3e_hdf"]:
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, band_index)
+            if reader_name == "fy3e_hdf":
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, georange, band=band_index)
             else:
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname)
-            return lats, lons, data_spd, data_dir, data_time, sate_name, res
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, georange)
+        return lats, lons, data_spd, data_dir, data_time, sate_name, res

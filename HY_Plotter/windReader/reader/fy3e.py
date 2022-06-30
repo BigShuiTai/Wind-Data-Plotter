@@ -4,21 +4,27 @@ import numpy as np
 
 class FY3E(object):
 
-    def extract(fname, band="C_band"):
+    def extract(fname, georange=(), band="C_band", test=False):
         try:
             init = h5py.File(fname, "r")
         except Exception:
+            if test:
+                return False
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
             return lats, lons, data_spd, data_dir, data_time, sate_name, res
-        
         if "FY3E" in str(init.attrs["File Name"]):
+            if test:
+                return True
+            if georange == ():
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
+                return lats, lons, data_spd, data_dir, data_time, sate_name, res
             # get values
-            fns = str(init.attrs["File Name"]).split("_")
+            fns = init.attrs["File Name"].decode('utf-8').split("_")
             lons, lats = init[band]["wvc_lon"][:], init[band]["wvc_lat"][:]
             data_spd, data_dir = init[band]["wind_speed_selected"][:], init[band]["wind_dir_selected"][:]
             data_time = fns[7] + fns[8]
-            sate_name = str(init.attrs["Satellite Name"]).replace("b","").replace("'","") \
-                         + " " + str(init.attrs["Sensor Name"]).replace("b","").replace("'","")
+            sate_name = init.attrs["Satellite Name"].decode('utf-8') \
+                         + " " + init.attrs["Sensor Name"].decode('utf-8')
             if band == "C_band":
                 res = "20KM"
             elif band == "Ku_band":

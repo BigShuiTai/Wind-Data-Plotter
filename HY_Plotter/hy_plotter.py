@@ -36,20 +36,33 @@ def stepcal(lonmax, lonmin, res, num=15, ip=1):
     totalpt = (lonmax - lonmin) / res * ip
     return int(totalpt / num)
 
-def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, ip=1, full_res=-1, **kwargs):
+def grid(route, fname, georange, sfname, band, lonlatstep=5, num=15, ip=1, full_res=-1, **kwargs):
     config = kwargs["config"]
     
-    lats, lons, data_spd, data_dir, data_time, sate_name, res = rgrib.get_data(route + fname, band)
+    lats, lons, data_spd, data_dir, data_time, sate_name, res = rgrib.get_data(route + fname, band, georange)
     
     # transfroming resolution into degree if it's string type
     _res_temp = res
     if isinstance(_res_temp, str):
         if "°" in _res_temp:
             _res_temp = float(_res_temp[:-1])
+            res = f"{_res_temp * 100}"
+            if res.endswith(".0"):
+                res = res[:-2] + "KM"
+            else:
+                res += "KM"
         elif "KM" in _res_temp.upper():
             _res_temp = float(_res_temp[:-2]) / 100
         else:
             _res_temp = float(_res_temp)
+            if "." in res:
+                res = f"{_res_temp * 100}"
+                if res.endswith(".0"):
+                    res = res[:-2] + "KM"
+                else:
+                    res += "KM"
+            else:
+                res += "KM"
     
     if isinstance(georange, tuple):
         # get range parameter
@@ -93,54 +106,28 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, 
     ax.patch.set_facecolor("#000000")
     
     # process data's valid time (latest)
-    if sate_name == "CFOSAT":
-        data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
+    if "CFOSAT" in sate_name:
+        try:
+            data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
+        except Exception:
+            data_time = datetime.datetime.strptime(data_time, "%Y-%m-%d %H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
+    elif "HY-2" in sate_name:
+        try:
+            data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
+        except Exception:
+            data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
+    elif "FY-3E" in sate_name:
+        try:
+            data_time = datetime.datetime.strptime(data_time, "%Y%m%d%H%M").strftime('%Y/%m/%d %H%MZ')
+        except Exception:
+            data_time = datetime.datetime.strptime(data_time, "%Y%m%d %H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
     else:
-        if "HY" in sate_name:
-            try:
-                data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
-            except Exception:
-                data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
-        elif "FY-3E" in sate_name:
-            try:
-                data_time = datetime.datetime.strptime(data_time, "%Y%m%d%H%M").strftime('%Y/%m/%d %H%MZ')
-            except Exception:
-                data_time = datetime.datetime.strptime(data_time, "%Y%m%d %H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
-        else:
-            try:
-                data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
-            except Exception:
-                try:
-                    data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
-                except Exception:
-                    try:
-                        data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
-                    except Exception:
-                        try:
-                            data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%S.%fZ").strftime('%Y/%m/%d %H%MZ')
-                        except Exception:
-                            try:
-                                data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
-                            except Exception:
-                                data_time = datetime.datetime.strptime(data_time, "%Y-%m-%d %H:%M:%S").strftime('%Y/%m/%d %H%MZ')
+        try:
+            data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
+        except Exception:
+            data_time = datetime.datetime.strptime(data_time, "%Y-%m-%d %H:%M:%S").strftime('%Y/%m/%d %H%MZ')
     
     print("...PLOTING...")
-    
-    '''
-    # get area's max wind
-    # You can delete these codes if you do not want to show the max wind
-    '''
-    dspd = data_spd[(lons<=lonmax)&(lons>=lonmin)&(lats<=latmax)&(lats>=latmin)]
-    if len(dspd) > 0 and not isinstance(dspd.max(), np.ma.core.MaskedConstant):
-        damax = round(dspd.max(), 1)
-    else:
-        damax = "0.0"
-
-    # add title at the top of figure
-    text = f'{sate_name} {res} Wind (barbs) [kt] (Generated by @Shuitai)\nValid Time: {data_time}'
-    ax.set_title(text, loc='left', fontsize=5)
-    text = f'Max. Wind: {damax}kt'
-    ax.set_title(text, loc='right', fontsize=4)
     
     # plot brabs with colormap and color-bar
     cmap, vmin, vmax = cm.get_colormap("wind")
@@ -190,6 +177,22 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, 
     cb.ax.tick_params(labelsize=4, length=0)
     cb.outline.set_linewidth(0.3)
     
+    '''
+    # get area's max wind
+    # You can delete these codes if you do not want to show the max wind
+    '''
+    dspd = data_spd[(lons<=lonmax)&(lons>=lonmin)&(lats<=latmax)&(lats>=latmin)]
+    if len(dspd) > 0 and not isinstance(dspd.max(), np.ma.core.MaskedConstant):
+        damax = round(dspd.max(), 1)
+    else:
+        damax = "0.0"
+
+    # add title at the top of figure
+    text = f'{sate_name} {res} Wind (barbs) [kt] (Generated by @Shuitai)\nValid Time: {data_time}'
+    ax.set_title(text, loc='left', fontsize=5)
+    text = f'Max. Wind: {damax}kt'
+    ax.set_title(text, loc='right', fontsize=4)
+    
     # add coastlines
     ax.add_feature(
         cfeature.COASTLINE.with_scale("10m"),
@@ -219,8 +222,8 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, res=0.125, num=15, 
     gl.bottom_labels = True
     gl.right_labels = False
     gl.left_labels = True
-    gl.xpadding = 2.5
-    gl.ypadding = 2.5
+    gl.xpadding = 3
+    gl.ypadding = 3
     gl.xlabel_style = {'size': 4, 'color': 'k', 'ha': 'center'}
     gl.ylabel_style = {'size': 4, 'color': 'k', 'va': 'center'}
     plt.rcParams['axes.unicode_minus'] = False
@@ -274,4 +277,4 @@ else:
         save_name = ""  # fill in any name what you like
 
 # finish loading config, start gird
-grid(route, file, georange, save_name, band, res=0.125, num=20, ip=1, lonlatstep=step, full_res=f_res, config=config)
+grid(route, file, georange, save_name, band, num=15, ip=1, lonlatstep=step, full_res=f_res, config=config)

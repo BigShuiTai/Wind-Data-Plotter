@@ -10,10 +10,7 @@ def load_reader(reader_name):
 
 def test_reader(reader_name, fname):
     try:
-        lats, lons, data_spd, data_dir, data_time, sate_name, res = WIND_READER_CONFIG[reader_name].extract(fname)
-        if res == "":
-            return False
-        else:
-            return True
-    except Exception:
+        test_result = WIND_READER_CONFIG[reader_name].extract(fname, test=True)
+        return test_result
+    except Exception as e:
         return False
