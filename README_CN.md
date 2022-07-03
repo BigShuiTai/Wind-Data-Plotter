@@ -1,48 +1,33 @@
- ## HY-CFOSAT-L2B-Wind-Data-Plotter
+# HY-CFOSAT-ASCAT-Wind-Data-Plotter
  
  ### 开始
  * 支持：HY-2A/HY-2B/HY-2C卫星微波辐射计SCA L2B HDF5数据 & CFOSAT SCA L2B/MetOp L2 Wind netCDF4数据 & FY-3E WindRAD C/Ku band HDF5数据
  * 数据下载：[国家卫星海洋应用中心NSOAS](https://osdds.nsoas.org.cn) [EUMETSAT](https://www.eumetsat.int/) [NSMC](http://satellite.nsmc.org.cn/PortalSite/Data/Satellite.aspx)
  
- #### 读取数据
-将`hy_plotter.py`中`route = ""`修改为数据所在路径，`hy_file = ""`修改为数据文件名
-```py
-route = "C:/Users/Administrator/Desktop/Sat/"
-hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
-```  
-为了方便起见，我们添加了一个配置加载方法。如果想使用config，请按照示例配置：
-* 开启CONFIG
-```py
-# demo codes
-CONFIG = True   # default is False
-```
-* 修改`config.json`进行配置
-```json
+#### 设置CONFIG
+在新版中必须设置CONFIG以绘制HY-2/FY-3E WindRAD/CFOSAT/MetOp-ASCAT的数据。
+* 参考以下`config.json`进行配置
+```javascript
 {
-    "projection": "PlateCarree",
-    "projection_parameters": {"central_longitude": 180},
-    "wind_band": "C_band",
-    "lon_lat_step": 5,
-    "full_res": -1,
-    "data_georange": [0, 10, 320, 330],
-    "data_route": "C:/Users/Administrator/Desktop/Sat/HY-CFOSAT-ASCAT-Wind-Data-Plotter-main/",
-    "data_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0.HDF",
-    "save_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0"
+    "projection": "Mercator", // Cartopy投影相关配置
+    "projection_parameters": {"central_longitude": 180}, // Cartopy投影相关配置
+    "reader": "metop_ascat_nc", // 选择相应的读取数据模块，包含hy_hdf, fy3e_hdf, cfosat_nc和metop_ascat_nc
+    "wind_band": 0, // 传感器通道，默认为0
+    "lon_lat_step": 2, // 为绘图定位坐标，将设置一个相同的x和y步长（经度和纬度）。
+    "full_res": 0, // 是否使用原始分辨率，默认为0
+    "step_in_res": 20, // 用于重新取样的数据，在使用full_res时无效。
+    "ip": 1, // 扩大重采样程度，在使用full_res时将无效，默认为1。
+    "crop_area": -1, // 是否对数据进行裁剪以加快绘图速度，注意返回的数据是一维数组类型。
+    "data_georange": [16.6, 24.6, 107.6, 115.6], // 裁剪数据的范围，在没有使用crop_area的情况下无效。
+    "data_route": "/www/wwwroot/HY-CFOSAT-ASCAT-Wind-Data-Plotter-main/", // 文件路径, 需要在最后加上"/"
+    "data_file": "ascat_20220702_010600_metopb_50781_eps_o_coa_3202_ovw.l2.nc", // 输入文件名
+    "save_file": "ascat_20220702_010600_metopb_50781_eps_o_coa_3202_ovw_l2" // 输出文件名
 }
-
 ```
- #### 选择数据区域
- 将`hy_plotter.py`中`grid(route, hy_file, (-40,-25,150,165), hy_file.replace(".h5", ""))`修改为所需绘制地区经纬，填写时纬度在前经度在后。
-*  ****注意：在调用`grid`函数之前，若您未开启config自动读取功能，需提前声明`config`变量为`dict()`，否则会报错****
- ```py
-# demo codes
-config = dict()
-route = "C:/Users/Administrator/Desktop/Sat/"
-hy_file = "H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv.h5"
-grid(route, hy_file, (17, 27, 267, 277), hy_file.replace(".h5", ""), config=config)
+#### 绘制
+运行`hy_plotter.py`
 
- ```
- 如遇问题请提交Issues  
+如遇问题请提交Issues  
  
  *  ****注意：目前仅支持CFOSAT EXPR（快交付产品数据），不支持OPER（业务处理数据）****
  
