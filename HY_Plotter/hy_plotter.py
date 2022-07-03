@@ -165,26 +165,14 @@ def grid(config_file):
     ver = np.asarray([spd*np.sin(agl*np.pi/180) for spd,agl in zip(data_spd,data_dir)])
     hriz = np.asarray([spd*np.cos(agl*np.pi/180) for spd,agl in zip(data_spd,data_dir)])
     
-    if full_res:
-        bs = stepcal(lonmax, lonmin, _res_temp, num, ip)
-        lons = lons[::bs,::bs]
-        lats = lats[::bs,::bs]
-        _ver = ver[::bs,::bs]
-        _hriz = hriz[::bs,::bs]
-        _spd = data_spd[::bs,::bs]
-    else:
-        _ver = ver
-        _hriz = hriz
-        _spd = data_spd
-    
     nh = lats > 0
     
     bb = ax.barbs(
         lons,
         lats,
-        _ver,
-        _hriz,
-        _spd,
+        ver,
+        hriz,
+        data_spd,
         cmap=cmap,
         clim={vmax:vmax, vmin:vmin},
         flip_barb=(~nh),
@@ -212,8 +200,8 @@ def grid(config_file):
     # get area's max wind
     # You can delete these codes if you do not want to show the max wind
     '''
-    if len(_spd) > 0 and not isinstance(_spd.max(), np.ma.core.MaskedConstant):
-        damax = round(_spd.max(), 1)
+    if len(data_spd) > 0 and not isinstance(data_spd.max(), np.ma.core.MaskedConstant):
+        damax = round(data_spd.max(), 1)
     else:
         damax = "0.0"
 
