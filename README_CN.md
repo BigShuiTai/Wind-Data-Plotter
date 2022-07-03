@@ -31,8 +31,4 @@
  
  *  ****注意：目前仅支持CFOSAT EXPR（快交付产品数据），不支持OPER（业务处理数据）****
  
-![H2B_OPER_SCA_L2B_OR_20210819T225905_20210820T004328_14133_pwp_250_07_owv](https://user-images.githubusercontent.com/54111871/130322471-36a3eb55-6f9f-4e08-9635-f46821782d0d.png)
-
-![CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv](https://user-images.githubusercontent.com/79071461/130332521-a5f5c0ad-99f2-472f-b9ce-4b9e1280b3ae.png)
-
-![ascat_20210705_000600_metopc_13795_eps_o_250_3203_ovw](https://user-images.githubusercontent.com/79071461/131166619-12ff979c-f48c-4421-bda4-ce3613efacfc.png)
+![H2B_OPER_SCA_L2B_OR_20220702T210807_20220702T222820_18502_pwp_250_08_owv.png](https://user-images.githubusercontent.com/79071461/177023454-2a3c70ad-6415-4dff-a448-3ac51e667b5d.png)
