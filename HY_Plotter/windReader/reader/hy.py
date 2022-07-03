@@ -10,12 +10,14 @@ class HY(object):
         except Exception:
             if test:
                 return False
+            print("hy_hdf reader warning: file not found or HDF file error")
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
             return lats, lons, data_spd, data_dir, data_time, sate_name, res
         if "HY-2" in init.attrs["Platform_ShortName"][-1].decode('utf-8'):
             if test:
                 return True
-            if georange == ():
+            if not len(georange) == 4:
+                print("hy_hdf reader warning: range should be a 4-D tuple")
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
                 return lats, lons, data_spd, data_dir, data_time, sate_name, res
             # get values
@@ -46,5 +48,6 @@ class HY(object):
             except Exception:
                 data_time = row_time[-1].decode('utf-8').strip()
         else:
+            print("hy_hdf reader warning: content of HDF file is not HY-2 data")
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
         return lats, lons, data_spd, data_dir, data_time, sate_name, res

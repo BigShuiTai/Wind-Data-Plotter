@@ -10,12 +10,14 @@ class FY3E(object):
         except Exception:
             if test:
                 return False
+            print("fy3e_hdf reader warning: file not found or HDF file error")
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
             return lats, lons, data_spd, data_dir, data_time, sate_name, res
         if "FY3E" in str(init.attrs["File Name"]):
             if test:
                 return True
-            if georange == ():
+            if not len(georange) == 4:
+                print("fy3e_hdf reader warning: range should be a 4-D tuple")
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
                 return lats, lons, data_spd, data_dir, data_time, sate_name, res
             # get values
@@ -38,5 +40,6 @@ class FY3E(object):
             data_spd, data_dir = data_spd / 100 / 0.514, data_dir / 10
             lons[lons < 0] += 360
         else:
+            print("fy3e_hdf reader warning: content of HDF file is not FY-3E data")
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
         return lats, lons, data_spd, data_dir, data_time, sate_name, res

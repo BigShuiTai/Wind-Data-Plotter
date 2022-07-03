@@ -10,12 +10,14 @@ class CFOSAT(object):
         except Exception:
             if test:
                 return False
+            print("cfosat_nc reader warning: file not found or NETCDF file error")
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
             return lats, lons, data_spd, data_dir, data_time, sate_name, res
         if init.platform == "CFOSAT":
             if test:
                 return True
-            if georange == ():
+            if not len(georange) == 4:
+                print("cfosat_nc reader warning: range should be a 4-D tuple")
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
                 return lats, lons, data_spd, data_dir, data_time, sate_name, res
             # get values
@@ -50,5 +52,6 @@ class CFOSAT(object):
                 for t in loc_time:
                     data_time += t.decode('utf-8')
         else:
+            print("cfosat_nc reader warning: content of NETCDF file is not CFOSAT data")
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
         return lats, lons, data_spd, data_dir, data_time, sate_name, res

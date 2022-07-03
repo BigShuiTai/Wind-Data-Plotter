@@ -10,12 +10,14 @@ class ASCAT(object):
         except Exception:
             if test:
                 return False
+            print("metop_ascat_nc reader warning: file not found or NETCDF file error")
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
             return lats, lons, data_spd, data_dir, data_time, sate_name, res
         if "ASCAT" in init.title:
             if test:
                 return True
-            if georange == ():
+            if not len(georange) == 4:
+                print("metop_ascat_nc reader warning: range should be a 4-D tuple")
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
                 return lats, lons, data_spd, data_dir, data_time, sate_name, res
             # get values
@@ -49,5 +51,6 @@ class ASCAT(object):
                 _time += timedelta(seconds=loc_time)
                 data_time = _time.strftime('%Y%m%dT%H:%M:%S')
         else:
+            print("metop_ascat_nc reader warning: content of NETCDF file is not ASCAT data")
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
         return lats, lons, data_spd, data_dir, data_time, sate_name, res
