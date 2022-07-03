@@ -30,16 +30,24 @@ class ASCAT(object):
             lons[lons < 0] += 360
             latmin, latmax, lonmin, lonmax = georange
             lon_mean = (lonmin + lonmax) / 2
+            lat_mean = (latmin + latmax) / 2
             loc = ()
-            for ilon, lon in np.ndenumerate(lons):
-                if abs(lon_mean - lon) <= 0.25:
+            for (ilon, lon), (ilat, lat) in zip(np.ndenumerate(lons), np.ndenumerate(lats)):
+                if abs(lon_mean - lon) <= 0.5 or abs(lat_mean - lat) <= 0.5:
                     loc = ilon
                     break
-            loc_time = row_time[loc[0],loc[1]]
-            from datetime import date, datetime, timedelta
-            _time = date(1990, 1, 1)
-            _time += timedelta(seconds=loc_time)
-            data_time = _time.strftime('%Y%m%dT%H:%M:%S')
+            try:
+                loc_time = row_time[loc[0],loc[1]]
+                from datetime import datetime, timedelta
+                _time = datetime(1990, 1, 1, 0, 0, 0)
+                _time += timedelta(seconds=loc_time)
+                data_time = _time.strftime('%Y%m%dT%H:%M:%S')
+            except Exception:
+                loc_time = row_time[-1,-1]
+                from datetime import datetime, timedelta
+                _time = datetime(1990, 1, 1, 0, 0, 0)
+                _time += timedelta(seconds=loc_time)
+                data_time = _time.strftime('%Y%m%dT%H:%M:%S')
         else:
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
         return lats, lons, data_spd, data_dir, data_time, sate_name, res

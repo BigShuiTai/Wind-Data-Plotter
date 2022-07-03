@@ -1,11 +1,15 @@
 {
-    "projection": "PlateCarree",
+    "projection": "Mercator",
     "projection_parameters": {"central_longitude": 180},
-    "wind_band": "C_band",
-    "lon_lat_step": 5,
-    "full_res": -1,
-    "data_georange": [0, 10, 320, 330],
+    "reader": "metop_ascat_nc",
+    "wind_band": 0,
+    "lon_lat_step": 2,
+    "full_res": 0,
+    "step_in_res": 20,
+    "ip": 1,
+    "crop_area": -1,
+    "data_georange": [16.6, 24.6, 107.6, 115.6],
     "data_route": "/www/wwwroot/HY-CFOSAT-ASCAT-Wind-Data-Plotter-main/",
-    "data_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0.HDF",
-    "save_file": "FY3E_WRADC_ORBD_L2_OVW_MLT_NUL_20220627_0745_010KM_V0"
+    "data_file": "ascat_20220702_010600_metopb_50781_eps_o_coa_3202_ovw.l2.nc",
+    "save_file": "ascat_20220702_010600_metopb_50781_eps_o_coa_3202_ovw_l2"
 }

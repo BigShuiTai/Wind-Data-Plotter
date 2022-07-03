@@ -1,11 +1,6 @@
-import os
-import glob
-import sys
-
-import json
-
-import datetime
+import sys, json
 import numpy as np
+from datetime import datetime
 
 import matplotlib
 matplotlib.use("agg")
@@ -17,14 +12,11 @@ import cartopy.feature as cfeature
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 
 from windReader.colormap import colormap as cm
-from windReader.rpdgrib import Rpdgrib as rgrib
+from windReader.extract import Extract as extract
+from windReader.utils import stepcal, resample
 
-CONFIG = True
-AUTO_SAVE_FIGURE = False
-
+# CONST BLOCK
 DEFAULT_WIDTH = 5
-
-data_crs = ccrs.PlateCarree()
 
 def calc_figsize(georange):
     latmin, latmax, lonmin, lonmax = georange
@@ -32,14 +24,56 @@ def calc_figsize(georange):
     figsize = (DEFAULT_WIDTH, DEFAULT_WIDTH * ratio)
     return figsize
 
-def stepcal(lonmax, lonmin, res, num=15, ip=1):
-    totalpt = (lonmax - lonmin) / res * ip
-    return int(totalpt / num)
-
-def grid(route, fname, georange, sfname, band, lonlatstep=5, num=15, ip=1, full_res=-1, **kwargs):
-    config = kwargs["config"]
+def grid(config_file):
+    # reading configuration from ```config.json``` in local folder
+    f = open(config_file, "r")
+    config = json.load(f)
+    f.close()
+    route = config["data_route"]
+    fname = config["data_file"]
+    reader = config["reader"]
+    georange = tuple(config["data_georange"])
+    sfname = config["save_file"]
+    band = config["wind_band"]
+    lonlatstep = config["lon_lat_step"]
+    num = config["step_in_res"]
+    ip = config["ip"]
+    crop_area = config["crop_area"]
+    full_res = config["full_res"]
     
-    lats, lons, data_spd, data_dir, data_time, sate_name, res = rgrib.get_data(route + fname, band, georange)
+    # whether using reampling (full resolution scale)
+    if str(full_res).upper() in ["0", "TRUE"]:
+        full_res = True
+    else:
+        full_res = False
+    
+    if str(crop_area).upper() in ["0", "TRUE"]:
+        crop_area = True
+    else:
+        crop_area = False
+    
+    if isinstance(georange, tuple):
+        # get range parameter
+        latmin, latmax, lonmin, lonmax = georange
+        # process longitude/latitude parameter
+        if lonmin < 0:
+            lonmin = 360 + lonmin
+        if lonmax < 0:
+            lonmax = 360 + lonmax
+        if lonmin > lonmax:
+            lonmin, lonmax = lonmax, lonmin
+        if latmin > latmax:
+            latmin, latmax = latmax, latmin
+        georange = (latmin, latmax, lonmin, lonmax)
+        # get an appropriate fig sizes
+        figsize = calc_figsize(georange)
+    else:
+        georange = (-90, 90, 0, 360)
+        latmin, latmax, lonmin, lonmax = georange
+        # get an appropriate fig sizes
+        figsize = calc_figsize(georange)
+    
+    lats, lons, data_spd, data_dir, data_time, sate_name, res = extract.get_data(route + fname, band, georange, reader=reader)
     
     # transfroming resolution into degree if it's string type
     _res_temp = res
@@ -63,44 +97,40 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, num=15, ip=1, full_
                     res += "KM"
             else:
                 res += "KM"
-    
-    if isinstance(georange, tuple):
-        # get range parameter
-        latmin, latmax, lonmin, lonmax = georange
-        # process longitude/latitude parameter
-        if lonmin < 0:
-            lonmin = 360 + lonmin
-        if lonmax < 0:
-            lonmax = 360 + lonmax
-        if lonmin > lonmax:
-            lonmin, lonmax = lonmax, lonmin
-        if latmin > latmax:
-            latmin, latmax = latmax, latmin
-        # get an appropriate fig sizes
-        figsize = calc_figsize(georange)
     else:
-        grange = (-90, 90, 0, 360)
-        latmin, latmax, lonmin, lonmax = grange
-        # get an appropriate fig sizes
-        figsize = calc_figsize(grange)
+        if "." in str(_res_temp):
+            res = f"{_res_temp * 100}"
+            if res.endswith(".0"):
+                res = res[:-2] + "KM"
+            else:
+                res += "KM"
+    
+    if not full_res:
+        bs = stepcal(lonmax, lonmin, _res_temp, num, ip)
+        lons = resample(lons, bs)
+        lats = resample(lats, bs)
+        data_spd = resample(data_spd, bs)
+        data_dir = resample(data_dir, bs)
+    
+    if crop_area:
+        data_spd = data_spd[(lons<=lonmax)&(lons>=lonmin)&(lats<=latmax)&(lats>=latmin)]
+        data_dir = data_dir[(lons<=lonmax)&(lons>=lonmin)&(lats<=latmax)&(lats>=latmin)]
+        _lons = lons[(lons<=lonmax)&(lons>=lonmin)&(lats<=latmax)&(lats>=latmin)]
+        _lats = lats[(lons<=lonmax)&(lons>=lonmin)&(lats<=latmax)&(lats>=latmin)]
+        data_spd = data_spd.filled()
+        lats, lons = _lats[data_spd!=-32768], _lons[data_spd!=-32768]
+        data_spd, data_dir = data_spd[data_spd!=-32768], data_dir[data_spd!=-32768]
     
     # set figure-dpi
     dpi = 1500 / DEFAULT_WIDTH
     
     # set axes projection
-    if CONFIG:
-        proj = getattr(ccrs, config["projection"])
-    else:
-        proj = ccrs.PlateCarree(central_longitude=180)
-    
+    proj = getattr(ccrs, config["projection"])
     
     # set figure and axis
-    if CONFIG:
-        fig, ax = plt.subplots(figsize=figsize, subplot_kw=dict(projection=proj(**config["projection_parameters"])))
-    else:
-        fig, ax = plt.subplots(figsize=figsize, subplot_kw=dict(projection=proj))
-    if isinstance(georange, tuple):
-        ax.set_extent([lonmin, lonmax, latmin, latmax], crs=data_crs)
+    fig, ax = plt.subplots(figsize=figsize, subplot_kw=dict(projection=proj(**config["projection_parameters"])))
+    if isinstance(georange, tuple) and not georange == (-90, 90, 0, 360):
+        ax.set_extent([lonmin, lonmax, latmin, latmax], crs=ccrs.PlateCarree())
     else:
         ax.set_global()
     ax.patch.set_facecolor("#000000")
@@ -108,24 +138,24 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, num=15, ip=1, full_
     # process data's valid time (latest)
     if "CFOSAT" in sate_name:
         try:
-            data_time = datetime.datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
+            data_time = datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
         except Exception:
-            data_time = datetime.datetime.strptime(data_time, "%Y-%m-%d %H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
+            data_time = datetime.strptime(data_time, "%Y-%m-%d %H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
     elif "HY-2" in sate_name:
         try:
-            data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
+            data_time = datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
         except Exception:
-            data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
+            data_time = datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
     elif "FY-3E" in sate_name:
         try:
-            data_time = datetime.datetime.strptime(data_time, "%Y%m%d%H%M").strftime('%Y/%m/%d %H%MZ')
+            data_time = datetime.strptime(data_time, "%Y%m%d%H%M").strftime('%Y/%m/%d %H%MZ')
         except Exception:
-            data_time = datetime.datetime.strptime(data_time, "%Y%m%d %H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
+            data_time = datetime.strptime(data_time, "%Y%m%d %H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
     else:
         try:
-            data_time = datetime.datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
+            data_time = datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
         except Exception:
-            data_time = datetime.datetime.strptime(data_time, "%Y-%m-%d %H:%M:%S").strftime('%Y/%m/%d %H%MZ')
+            data_time = datetime.strptime(data_time, "%Y-%m-%d %H:%M:%S").strftime('%Y/%m/%d %H%MZ')
     
     print("...PLOTING...")
     
@@ -135,12 +165,13 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, num=15, ip=1, full_
     ver = np.asarray([spd*np.sin(agl*np.pi/180) for spd,agl in zip(data_spd,data_dir)])
     hriz = np.asarray([spd*np.cos(agl*np.pi/180) for spd,agl in zip(data_spd,data_dir)])
     
-    if full_res == -1:
+    if full_res:
         bs = stepcal(lonmax, lonmin, _res_temp, num, ip)
+        lons = lons[::bs,::bs]
+        lats = lats[::bs,::bs]
         _ver = ver[::bs,::bs]
         _hriz = hriz[::bs,::bs]
         _spd = data_spd[::bs,::bs]
-        lons, lats = lons[::bs,::bs], lats[::bs,::bs]
     else:
         _ver = ver
         _hriz = hriz
@@ -160,7 +191,7 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, num=15, ip=1, full_
         pivot='middle',
         length=3.5,
         linewidth=0.5,
-        transform=data_crs,
+        transform=ccrs.PlateCarree(),
     )
     
     cb = plt.colorbar(
@@ -181,14 +212,17 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, num=15, ip=1, full_
     # get area's max wind
     # You can delete these codes if you do not want to show the max wind
     '''
-    dspd = data_spd[(lons<=lonmax)&(lons>=lonmin)&(lats<=latmax)&(lats>=latmin)]
-    if len(dspd) > 0 and not isinstance(dspd.max(), np.ma.core.MaskedConstant):
-        damax = round(dspd.max(), 1)
+    if len(_spd) > 0 and not isinstance(_spd.max(), np.ma.core.MaskedConstant):
+        damax = round(_spd.max(), 1)
     else:
         damax = "0.0"
 
     # add title at the top of figure
-    text = f'{sate_name} {res} Wind (barbs) [kt] (Generated by @Shuitai)\nValid Time: {data_time}'
+    if full_res:
+        text = f'{sate_name} {res} Wind (barbs) [kt] (Resampled)'
+    else:
+        text = f'{sate_name} {res} Wind (barbs) [kt]'
+    text += f' (Generated by @Shuitai)\nValid Time: {data_time}'
     ax.set_title(text, loc='left', fontsize=5)
     text = f'Max. Wind: {damax}kt'
     ax.set_title(text, loc='right', fontsize=4)
@@ -209,7 +243,7 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, num=15, ip=1, full_
     ax.xaxis.set_major_formatter(lon_formatter)
     ax.yaxis.set_major_formatter(lat_formatter)
     gl = ax.gridlines(
-        crs=data_crs,
+        crs=ccrs.PlateCarree(),
         draw_labels=True,
         linewidth=0.6,
         linestyle=':',
@@ -249,32 +283,6 @@ def grid(route, fname, georange, sfname, band, lonlatstep=5, num=15, ip=1, full_
     plt.close("all")
 
 # main codes
-# loading CONFIG parameter for next step on the method of reading config file
-if CONFIG:
-    with open("config.json", "r") as f:
-        config = json.load(f)
-        route = config["data_route"]
-        file = config["data_file"]
-        band = config["wind_band"]
-        step = config["lon_lat_step"]
-        f_res = int(config["full_res"])
-        georange = tuple(config["data_georange"])
-        if AUTO_SAVE_FIGURE:
-            save_name = file.split(".")[0]
-        else:
-            save_name = config["save_file"]
-else:
-    config = dict()
-    route = ""
-    file = "CFO_EXPR_SCA_C_L2B_OR_20210801T030812_15259_250_33_owv.nc"
-    band = 0
-    step = 10
-    f_res = -1
-    georange = (16.035, 28.035, 221.122, 233.122) # fill in any tuple what you like
-    if AUTO_SAVE_FIGURE:
-        save_name = file.split(".")[0]
-    else:
-        save_name = ""  # fill in any name what you like
-
-# finish loading config, start gird
-grid(route, file, georange, save_name, band, num=15, ip=1, lonlatstep=step, full_res=f_res, config=config)
+if __name__ == '__main__':
+    config_file = 'config.json'
+    grid(config_file)

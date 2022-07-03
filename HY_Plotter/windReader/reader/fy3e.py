@@ -33,8 +33,8 @@ class FY3E(object):
                 res = "20KM"
             sate_name += " " + band
             # process values
-            data_spd = np.ma.array(data_spd, mask=(data_spd==32767), fill_value=0)
-            data_dir = np.ma.array(data_dir, mask=(data_dir==32767), fill_value=0)
+            data_spd = np.ma.array(data_spd, mask=(data_spd==32767), fill_value=-32768)
+            data_dir = np.ma.array(data_dir, mask=(data_dir==32767), fill_value=-32768)
             data_spd, data_dir = data_spd / 100 / 0.514, data_dir / 10
             lons[lons < 0] += 360
         else:
