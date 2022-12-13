@@ -22,16 +22,16 @@ class Extract(object):
                     break
             if reader == "":
                 raise ValueError("Reader name was not found in the support readers list")
-            reader = load_reader(reader)
-            if _reader_name == "fy3e_hdf":
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, georange=georange, band=band_index)
+            _reader = load_reader(reader)
+            if reader == "fy3e_hdf":
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = _reader.extract(fname, georange=georange, band=band_index)
             else:
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, georange=georange)
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = _reader.extract(fname, georange=georange)
         else:
             print(f"Using {reader} reader to read this file...")
-            reader = load_reader(reader)
+            _reader = load_reader(reader)
             if reader == "fy3e_hdf":
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, georange=georange, band=band_index)
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = _reader.extract(fname, georange=georange, band=band_index)
             else:
-                lats, lons, data_spd, data_dir, data_time, sate_name, res = reader.extract(fname, georange=georange)
+                lats, lons, data_spd, data_dir, data_time, sate_name, res = _reader.extract(fname, georange=georange)
         return lats, lons, data_spd, data_dir, data_time, sate_name, res
