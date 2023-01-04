@@ -1,7 +1,7 @@
 # Wind-Data-Plotter
 [中文文档](/README_CN.md) 
   
-HY-2 A to D & FY-3E C/Ku band & CFOSAT & MetOp-ASCAT Satellite Wind Speed & Wind Dirctory Data Plotter (Based on HDF5 / netCDF)  
+HY-2A/B/C/D & CFOSAT & METOP (SCA) & FY-3E (WindRAD) Satellite Wind Product Data Plotter (Based on HDF5 / netCDF)
 
 ## Starting
 
