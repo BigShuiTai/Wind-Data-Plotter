@@ -4,7 +4,7 @@ import numpy as np
 
 class FY3E(object):
 
-    def extract(fname, georange=(), band="C_band", test=False):
+    def extract(fname, georange=(), band="C_band", daily=False, test=False):
         try:
             init = h5py.File(fname, "r")
         except Exception:
@@ -21,12 +21,21 @@ class FY3E(object):
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
                 return lats, lons, data_spd, data_dir, data_time, sate_name, res
             # get values
-            fns = init.attrs["File Name"].decode('utf-8').split("_")
-            lons, lats = init[band]["wvc_lon"][:], init[band]["wvc_lat"][:]
-            data_spd, data_dir = init[band]["wind_speed_selected"][:], init[band]["wind_dir_selected"][:]
-            data_time = fns[7] + fns[8]
-            sate_name = init.attrs["Satellite Name"].decode('utf-8') \
-                         + " " + init.attrs["Sensor Name"].decode('utf-8')
+            if daily:
+                # WindRAD daily data (POAD)
+                fns = init.attrs["File Name"].split("_")
+                lons, lats = init[band]["grid_lon"][:], init[band]["grid_lat"][:]
+                data_spd, data_dir = init[band]["wind_speed_selected"][:], init[band]["wind_dir_selected"][:]
+                data_time = (fns[7] + fns[8]).replace('POAD', ' 00:00:00.0')
+                sate_name = init.attrs["Satellite Name"] \
+                             + " " + init.attrs["Sensor Name"]
+            else:
+                fns = init.attrs["File Name"].decode('utf-8').split("_")
+                lons, lats = init[band]["wvc_lon"][:], init[band]["wvc_lat"][:]
+                data_spd, data_dir = init[band]["wind_speed_selected"][:], init[band]["wind_dir_selected"][:]
+                data_time = fns[7] + fns[8]
+                sate_name = init.attrs["Satellite Name"].decode('utf-8') \
+                             + " " + init.attrs["Sensor Name"].decode('utf-8')
             if band == "C_band":
                 res = "20KM"
             elif band == "Ku_band":
