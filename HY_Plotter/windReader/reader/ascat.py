@@ -1,6 +1,7 @@
 import netCDF4
 
 import numpy as np
+from datetime import datetime, timedelta
 
 class ASCAT(object):
 
@@ -39,14 +40,12 @@ class ASCAT(object):
                     loc = ilon
                     break
             try:
-                loc_time = row_time[loc[0],loc[1]]
-                from datetime import datetime, timedelta
+                loc_time = int(row_time[loc[0],loc[1]])
                 _time = datetime(1990, 1, 1, 0, 0, 0)
                 _time += timedelta(seconds=loc_time)
                 data_time = _time.strftime('%Y%m%dT%H:%M:%S')
             except Exception:
-                loc_time = row_time[-1,-1]
-                from datetime import datetime, timedelta
+                loc_time = int(row_time[-1,-1]_
                 _time = datetime(1990, 1, 1, 0, 0, 0)
                 _time += timedelta(seconds=loc_time)
                 data_time = _time.strftime('%Y%m%dT%H:%M:%S')
