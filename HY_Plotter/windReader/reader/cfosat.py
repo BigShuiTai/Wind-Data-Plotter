@@ -1,6 +1,6 @@
 import netCDF4
-
 import numpy as np
+from datetime import datetime, timedelta, timezone
 
 class CFOSAT(object):
 
@@ -8,14 +8,26 @@ class CFOSAT(object):
         try:
             init = netCDF4.Dataset(fname)
         except Exception:
-            if test:
-                return False
+            if test: return False
             print("cfosat_nc reader warning: file not found or NETCDF file error")
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
             return lats, lons, data_spd, data_dir, data_time, sate_name, res
         if init.platform == "CFOSAT":
-            if test:
-                return True
+            if test: return True
+            if not georange or len(georange) == 0:
+                lons, lats = init.variables["wvc_lon"][:], init.variables["wvc_lat"][:]
+                data_spd, data_dir = init.variables["wind_speed_selection"][:], init.variables["wind_dir_selection"][:]
+                data_time = init.variables["row_time"][:]
+                sate_name = f"{init.platform} Scatterometer Level 2B"
+                res = "12.5KM" if init.dimensions["numrows"].size == 3248 else "25KM"
+                # process values
+                lons.fill_value = lats.fill_value = 1.7e+38
+                data_spd.fill_value = data_dir.fill_value = -32767
+                data_spd = data_spd / 0.514
+                lons[lons < 0] += 360
+                lons, lats = lons.filled(), lats.filled()
+                data_spd, data_dir = data_spd.filled(), data_dir.filled()
+                return lats, lons, data_spd, data_dir, data_time, sate_name, res
             if not len(georange) == 4:
                 print("cfosat_nc reader warning: range should be a 4-D tuple")
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
@@ -23,26 +35,33 @@ class CFOSAT(object):
             # get values
             lons, lats = init.variables["wvc_lon"][:], init.variables["wvc_lat"][:]
             data_spd, data_dir = init.variables["wind_speed_selection"][:], init.variables["wind_dir_selection"][:]
-            row_time = init.variables["row_time"][:]
             sate_name = f"{init.platform} Scatterometer Level 2B"
-            if init.dimensions["numrows"].size == 3248:
-                res = 0.125
-            else:
-                res = 0.25
+            res = "12.5KM" if init.dimensions["numrows"].size == 3248 else "25KM"
             # process values
-            lons.fill_value = lats.fill_value = data_spd.fill_value = data_dir.fill_value = -32768
+            lons.fill_value = lats.fill_value = 1.7e+38
+            data_spd.fill_value = data_dir.fill_value = -32767
             data_spd = data_spd / 0.514
             lons[lons < 0] += 360
+            # get time
+            row_time = init.variables["row_time"][:]
             latmin, latmax, lonmin, lonmax = georange
             lon_mean = (lonmin + lonmax) / 2
             lat_mean = (latmin + latmax) / 2
-            loc = ()
+            loc, min_dist = np.nan, 1000
+            locs = []
             for (ilon, lon), (ilat, lat) in zip(np.ndenumerate(lons), np.ndenumerate(lats)):
-                if abs(lon_mean - lon) <= 0.5 or abs(lat_mean - lat) <= 0.5:
-                    loc = ilon
-                    break
+                if lon >= lonmin and lon <= lonmax and lat >= latmin and lat <= latmax:
+                    locs.append((ilon, lon, lat))
+            for loc_meta in locs:
+                loc_, lon_, lat_ = loc_meta
+                lon_diff = abs(lon_ - lon_mean)
+                lat_diff = abs(lat_ - lat_mean)
+                lonlat_dist = np.sqrt(lon_diff**2 + lat_diff**2)
+                if lonlat_dist <= min_dist:
+                    min_dist = lonlat_dist
+                    loc = loc_[0]
             try:
-                loc_time = row_time[loc[0]]
+                loc_time = row_time[loc]
                 data_time = ''
                 for t in loc_time:
                     data_time += t.decode('utf-8')
