@@ -6,6 +6,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+from matplotlib.colors import Normalize
+plt.rcParams['axes.unicode_minus'] = False
 
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -24,11 +26,8 @@ def calc_figsize(georange):
     figsize = (DEFAULT_WIDTH, DEFAULT_WIDTH * ratio)
     return figsize
 
-def grid(config_file):
-    # reading configuration from ```config.json``` in local folder
-    f = open(config_file, "r")
-    config = json.load(f)
-    f.close()
+def grid(config):
+    # reading configuration
     route = config["data_route"]
     fname = config["data_file"]
     reader = config["reader"]
@@ -75,38 +74,9 @@ def grid(config_file):
     
     lats, lons, data_spd, data_dir, data_time, sate_name, res = extract.get_data(route + fname, band, georange, reader=reader)
     
-    # transfroming resolution into degree if it's string type
-    _res_temp = res
-    if isinstance(_res_temp, str):
-        if "°" in _res_temp:
-            _res_temp = float(_res_temp[:-1])
-            res = f"{_res_temp * 100}"
-            if res.endswith(".0"):
-                res = res[:-2] + "KM"
-            else:
-                res += "KM"
-        elif "KM" in _res_temp.upper():
-            _res_temp = float(_res_temp[:-2]) / 100
-        else:
-            _res_temp = float(_res_temp)
-            if "." in res:
-                res = f"{_res_temp * 100}"
-                if res.endswith(".0"):
-                    res = res[:-2] + "KM"
-                else:
-                    res += "KM"
-            else:
-                res += "KM"
-    else:
-        if "." in str(_res_temp):
-            res = f"{_res_temp * 100}"
-            if res.endswith(".0"):
-                res = res[:-2] + "KM"
-            else:
-                res += "KM"
-    
     if not full_res:
-        bs = stepcal(lonmax, lonmin, _res_temp, num, ip)
+        res_num = float(res[:-2])
+        bs = stepcal(lonmax, lonmin, res_num, num, ip)
         lons = resample(lons, bs)
         lats = resample(lats, bs)
         data_spd = resample(data_spd, bs)
@@ -121,6 +91,30 @@ def grid(config_file):
         lats, lons = _lats[data_spd!=-32768], _lons[data_spd!=-32768]
         data_spd, data_dir = data_spd[data_spd!=-32768], data_dir[data_spd!=-32768]
     
+    # process data's valid time (latest)
+    if "CFOSAT" in sate_name:
+        try:
+            data_time = datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ")
+        except Exception:
+            data_time = datetime.strptime(data_time, "%Y-%m-%d %H:%M:%SZ")
+    
+    '''
+    # get area's max wind
+    # You can delete these codes if you do not want to show the max wind
+    '''
+    if len(data_spd) == 0 or isinstance(data_spd.max(), np.ma.core.MaskedConstant):
+        print("Empty data for given area.")
+        damax = "0.0"
+    else:
+        damax = "%.01f" % data_spd.max()
+
+    # transfroming resolution string
+    sat_title = f"{sate_name}"
+    if isinstance(res, str) and res.endswith("KM"):
+        sat_title += " " + res
+    
+    print("...PLOTING...")
+
     # set figure-dpi
     dpi = 1500 / DEFAULT_WIDTH
     
@@ -134,30 +128,6 @@ def grid(config_file):
     else:
         ax.set_global()
     ax.patch.set_facecolor("#000000")
-    
-    # process data's valid time (latest)
-    if "CFOSAT" in sate_name:
-        try:
-            data_time = datetime.strptime(data_time, "%Y-%m-%dT%H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
-        except Exception:
-            data_time = datetime.strptime(data_time, "%Y-%m-%d %H:%M:%SZ").strftime('%Y/%m/%d %H%MZ')
-    elif "HY-2" in sate_name:
-        try:
-            data_time = datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
-        except Exception:
-            data_time = datetime.strptime(data_time, "%Y%m%dT%H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
-    elif "FY-3E" in sate_name:
-        try:
-            data_time = datetime.strptime(data_time, "%Y%m%d%H%M").strftime('%Y/%m/%d %H%MZ')
-        except Exception:
-            data_time = datetime.strptime(data_time, "%Y%m%d %H:%M:%S.%f").strftime('%Y/%m/%d %H%MZ')
-    else:
-        try:
-            data_time = datetime.strptime(data_time, "%Y%m%dT%H:%M:%S").strftime('%Y/%m/%d %H%MZ')
-        except Exception:
-            data_time = datetime.strptime(data_time, "%Y-%m-%d %H:%M:%S").strftime('%Y/%m/%d %H%MZ')
-    
-    print("...PLOTING...")
     
     # plot brabs with colormap and color-bar
     cmap, vmin, vmax = cm.get_colormap("wind")
@@ -174,11 +144,11 @@ def grid(config_file):
         hriz,
         data_spd,
         cmap=cmap,
-        clim={vmax:vmax, vmin:vmin},
+        norm=Normalize(vmin=vmin, vmax=vmax),
         flip_barb=(~nh),
         pivot='middle',
         length=3.5,
-        linewidth=0.5,
+        linewidth=0.25,
         transform=ccrs.PlateCarree(),
     )
     
@@ -195,26 +165,7 @@ def grid(config_file):
     cb.set_ticks(np.arange(0, 70, 5).tolist())
     cb.ax.tick_params(labelsize=4, length=0)
     cb.outline.set_linewidth(0.3)
-    
-    '''
-    # get area's max wind
-    # You can delete these codes if you do not want to show the max wind
-    '''
-    if len(data_spd) > 0 and not isinstance(data_spd.max(), np.ma.core.MaskedConstant):
-        damax = round(data_spd.max(), 1)
-    else:
-        damax = "0.0"
 
-    # add title at the top of figure
-    if full_res:
-        text = f'{sate_name} {res} Wind (barbs) [kt]'
-    else:
-        text = f'{sate_name} {res} Wind (barbs) [kt] (Resampled)'
-    text += f' (Generated by @Shuitai)\nValid Time: {data_time}'
-    ax.set_title(text, loc='left', fontsize=5)
-    text = f'Max. Wind: {damax}kt'
-    ax.set_title(text, loc='right', fontsize=4)
-    
     # add coastlines
     ax.add_feature(
         cfeature.COASTLINE.with_scale("10m"),
@@ -248,7 +199,20 @@ def grid(config_file):
     gl.ypadding = 3
     gl.xlabel_style = {'size': 4, 'color': 'k', 'ha': 'center'}
     gl.ylabel_style = {'size': 4, 'color': 'k', 'va': 'center'}
-    plt.rcParams['axes.unicode_minus'] = False
+
+    # add title at the top of figure
+    if full_res:
+        text = f'{sat_title} Wind (barbs) [kt]'
+    else:
+        text = f'{sat_title} Wind (barbs) [kt] (Resampled)'
+    text += f' (Generated by @Shuitai)\nValid Time: {data_time.strftime("%Y/%m/%d %H%MZ")}'
+    ax.set_title(text, loc='left', fontsize=5)
+    
+    try:
+        text = f'Max. Wind: {damax}kt'
+        ax.set_title(text, loc='right', fontsize=4)
+    except NameError:
+        pass
     
     plt.axis("off")
     
@@ -257,7 +221,7 @@ def grid(config_file):
         if sfname == "":
             raise ValueError("File name should not an empty string")
     except ValueError as e:
-        print(repr(e))
+        print("ERROR:", e)
         sys.exit(0)
     
     ptext = sfname
@@ -272,5 +236,10 @@ def grid(config_file):
 
 # main codes
 if __name__ == '__main__':
-    config_file = 'config.json'
-    grid(config_file)
+    import argparse
+    parser = argparse.ArgumentParser(description='HY_plotter')
+    parser.add_argument('-c','--config_path', default='config.json')
+    args = parser.parse_args()
+    with open(args.config_path, "r") as f:
+        config = json.load(f)
+    main(config)
