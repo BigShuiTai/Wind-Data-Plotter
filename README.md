@@ -5,7 +5,8 @@ HY-2A/B/C/D & CFOSAT & FY-3E (WindRAD) & METOP (ASCAT) Satellite Wind Product Da
 
 ## Starting
 
- * HY Plotter supports HY-2A/HY-2B/HY-2C/HY-2D SCA L2B & FY-3E WindRAD C/Ku band L2 data based on HDF5, and CFOSAT SCA L2B & MetOp ASCAT L2 data based on netCDF4.
+Plotter supports HY-2A/HY-2B/HY-2C/HY-2D SCA L2B & FY-3E WindRAD C/Ku band L2 data based on HDF5, and CFOSAT SCA L2B & MetOp ASCAT L2 data based on netCDF4.
+
  * For downloading HY-2/CFOSAT data, visit [国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
  * For FY-3E WindRAD C/Ku band L2 data, visit [国家卫星气象中心 NSMC](https://satellite.nsmc.org.cn/DataPortal/cn/home/index.html)
  * For MetOp ASCAT data, please visit [EUMETSAT](https://www.eumetsat.int/)
