@@ -1,20 +1,18 @@
 # Wind-Data-Plotter
 [中文文档](/README_CN.md) 
   
-HY-2A/B/C/D & CFOSAT & METOP (SCA) & FY-3E (WindRAD) Satellite Wind Product Data Plotter (Based on HDF5 / netCDF)
+HY-2A/B/C/D & CFOSAT & FY-3E (WindRAD) & METOP (ASCAT) Satellite Wind Product Data Plotter (Based on HDF5 / netCDF4)
 
 ## Starting
 
- * HY Plotter supports HY-2A/HY-2B/HY-2C/HY-2D SCA L2B data based on HDF5, CFOSAT SCA L2B & MetOp-ASCAT L2 data based on netCDF, and FY-3E WindRAD C/Ku band L2 data based on HDF5.
- * If you want to download HY-2/CFOSAT data, you can visit: [国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
- * For MetOp-ASCAT data, you can visit [EUMETSAT](https://www.eumetsat.int/)
- * For FY-3E WindRAD C/Ku band L2 data, you should visit [NSMC](http://satellite.nsmc.org.cn/PortalSite/Data/Satellite.aspx)
+ * HY Plotter supports HY-2A/HY-2B/HY-2C/HY-2D SCA L2B & FY-3E WindRAD C/Ku band L2 data based on HDF5, and CFOSAT SCA L2B & MetOp ASCAT L2 data based on netCDF4.
+ * For downloading HY-2/CFOSAT data, visit [国家卫星海洋应用中心 NSOAS](https://osdds.nsoas.org.cn)
+ * For FY-3E WindRAD C/Ku band L2 data, visit [国家卫星气象中心 NSMC](https://satellite.nsmc.org.cn/DataPortal/cn/home/index.html)
+ * For MetOp ASCAT data, please visit [EUMETSAT](https://www.eumetsat.int/)
 
 ## Modify targeted file in HY-Plotter
 
 If you want to load HY-2/FY-3E WindRAD/CFOSAT/MetOp-ASCAT data in HY-Plotter correctly, you must modify your configuration and change the ```data_route``` & ```data_file```.
-
-****~~For convenience, we have added a config loading method. If you truly want to use config, here's an example for you:~~****
 
 ****In the newest HY-Plotter version, we have changed the setting that you must use the configuration, and we will give you an example to help you configure your config file:****
  * Firstly, check the ```hy_plotter``` to find whether its configuration file is invalid or not
@@ -43,7 +41,7 @@ If you want to load HY-2/FY-3E WindRAD/CFOSAT/MetOp-ASCAT data in HY-Plotter cor
 
 ## NOTICE
 
- * ****Currently only supports CFOSAT EXPR Data, and doesn't support OPER**** 
+ * ****Currently only supports CFOSAT EXPR Data, not support OPER**** 
 
 If you meet some difficulties or bugs, please submit issues to us.
 
