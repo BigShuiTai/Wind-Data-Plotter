@@ -30,7 +30,7 @@ class HY(object):
                 dir_slope = init["wind_dir_selection"].attrs["scale_factor"]
                 data_time = combine_wvc_time(init["wvc_row_time"][:])
                 sate_name = init.attrs["Platform_ShortName"][-1].decode('utf-8').strip() \
-                            + " Scatterometer Level 2B"
+                            + " HSCAT Level 2B"
                 res = "25KM"
                 # process values
                 lons = np.ma.array(lons, mask=lons == 1.7e+38, fill_value=1.7e+38)
@@ -53,7 +53,7 @@ class HY(object):
             spd_slope = init["wind_speed_selection"].attrs["scale_factor"]
             dir_slope = init["wind_dir_selection"].attrs["scale_factor"]
             sate_name = init.attrs["Platform_ShortName"][-1].decode('utf-8').strip() \
-                        + " Scatterometer Level 2B"
+                        + " HSCAT Level 2B"
             res = "25KM"
             # process values
             lons = np.ma.array(lons, mask=lons == 1.7e+38, fill_value=1.7e+38)
