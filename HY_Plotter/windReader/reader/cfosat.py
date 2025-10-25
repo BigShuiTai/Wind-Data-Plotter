@@ -18,7 +18,7 @@ class CFOSAT(object):
                 lons, lats = init.variables["wvc_lon"][:], init.variables["wvc_lat"][:]
                 data_spd, data_dir = init.variables["wind_speed_selection"][:], init.variables["wind_dir_selection"][:]
                 data_time = init.variables["row_time"][:]
-                sate_name = f"{init.platform} Scatterometer Level 2B"
+                sate_name = f"{init.platform} CSCAT Level 2B"
                 res = "12.5KM" if init.dimensions["numrows"].size == 3248 else "25KM"
                 # process values
                 lons.fill_value = lats.fill_value = 1.7e+38
@@ -35,7 +35,7 @@ class CFOSAT(object):
             # get values
             lons, lats = init.variables["wvc_lon"][:], init.variables["wvc_lat"][:]
             data_spd, data_dir = init.variables["wind_speed_selection"][:], init.variables["wind_dir_selection"][:]
-            sate_name = f"{init.platform} Scatterometer Level 2B"
+            sate_name = f"{init.platform} CSCAT Level 2B"
             res = "12.5KM" if init.dimensions["numrows"].size == 3248 else "25KM"
             # process values
             lons.fill_value = lats.fill_value = 1.7e+38
