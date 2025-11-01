@@ -15,22 +15,27 @@ def combine_wvc_time(day_count, millisecond_count, ms_slope):
 
 class FY3E(object):
 
-    def extract(fname, georange=(), band="C_band", test=False):
+    def extract(fname, georange=(), band="C_band", daily=False, test=False):
         try:
             init = h5py.File(fname, "r")
+            satellite = init.attrs["Satellite Name"].decode('utf-8')
+            sensor = init.attrs["Sensor Name"].decode('utf-8')
         except Exception:
-            if test:
-                return False
             print("fy3e_hdf reader warning: file not found or HDF file error")
+            if test: return False
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
             return lats, lons, data_spd, data_dir, data_time, sate_name, res
-        if "FY3E" in str(init.attrs["File Name"]):
+        if satellite == "FY-3E" and sensor == "WindRAD":
             if test:
+                print("Successfully read HDF file using fy3e_hdf reader.")
                 return True
             if not georange or len(georange) == 0:
                 # get values
-                fns = init.attrs["File Name"].decode('utf-8').split("_")
-                lons, lats = init[band]["wvc_lon"][:], init[band]["wvc_lat"][:]
+                if daily:
+                    # WindRAD daily data (POAD)
+                    lons, lats = init[band]["grid_lon"][:], init[band]["grid_lat"][:]
+                else:
+                    lons, lats = init[band]["wvc_lon"][:], init[band]["wvc_lat"][:]
                 data_spd, data_dir = init[band]["wind_speed_selected"][:], init[band]["wind_dir_selected"][:]
                 day_count, millisecond_count = init[band]["day_count"][:], init[band]["millisecond_count"][:]
                 spd_slope = init[band]["wind_speed_selected"].attrs["Slope"]
@@ -53,8 +58,11 @@ class FY3E(object):
                 lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
                 return lats, lons, data_spd, data_dir, data_time, sate_name, res
             # get values
-            fns = init.attrs["File Name"].decode('utf-8').split("_")
-            lons, lats = init[band]["wvc_lon"][:], init[band]["wvc_lat"][:]
+            if daily:
+                # WindRAD daily data (POAD)
+                lons, lats = init[band]["grid_lon"][:], init[band]["grid_lat"][:]
+            else:
+                lons, lats = init[band]["wvc_lon"][:], init[band]["wvc_lat"][:]
             data_spd, data_dir = init[band]["wind_speed_selected"][:], init[band]["wind_dir_selected"][:]
             day_count, millisecond_count = init[band]["day_count"][:], init[band]["millisecond_count"][:]
             spd_slope = init[band]["wind_speed_selected"].attrs["Slope"]
@@ -93,5 +101,6 @@ class FY3E(object):
                 data_time = row_time[-1]
         else:
             print("fy3e_hdf reader warning: content of HDF file is not FY-3E data")
+            if test: return False
             lats, lons, data_spd, data_dir, data_time, sate_name, res = [], [], [], [], "", "", ""
         return lats, lons, data_spd, data_dir, data_time, sate_name, res
