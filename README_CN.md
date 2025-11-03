@@ -1,5 +1,11 @@
 # HY-CFOSAT-ASCAT-Wind-Data-Plotter
- 
+
+# 更新公告
+
+重构版本已公布至此仓库: [BigShuiTai/Wind-Reader](https://github.com/BigShuiTai/Wind-Reader)
+
+本仓库今后将不会再提供任何更新。
+
  ### 开始
  * 支持：HY-2A/HY-2B/HY-2C卫星微波辐射计SCA L2B HDF5数据 & CFOSAT SCA L2B/MetOp L2 Wind netCDF4数据 & FY-3E WindRAD C/Ku band HDF5数据
  * 数据下载：[国家卫星海洋应用中心NSOAS](https://osdds.nsoas.org.cn) [EUMETSAT](https://www.eumetsat.int/) [NSMC](http://satellite.nsmc.org.cn/PortalSite/Data/Satellite.aspx)
