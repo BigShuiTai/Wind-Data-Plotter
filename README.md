@@ -3,6 +3,12 @@
   
 HY-2A/B/C/D & CFOSAT & FY-3E (WindRAD) & METOP (ASCAT) Satellite Wind Product Data Plotter (Based on HDF5 / netCDF4)
 
+# Notice
+
+**Refactored version for this repo: [BigShuiTai/Wind-Reader](https://github.com/BigShuiTai/Wind-Reader)**
+
+**This repository will no longer be updated.**
+
 ## Starting
 
 Plotter supports HY-2A/HY-2B/HY-2C/HY-2D SCA L2B & FY-3E WindRAD C/Ku band L2 data based on HDF5, and CFOSAT SCA L2B & MetOp ASCAT L2 data based on netCDF4.
